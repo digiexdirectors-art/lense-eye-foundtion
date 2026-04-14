@@ -61,7 +61,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, isOpen, onClose, onSuccess,
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const payload = { ...formData };
+      const payload: any = { ...formData };
       if (user && !payload.password) {
         delete payload.password; 
       }
