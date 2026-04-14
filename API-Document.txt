@@ -1,0 +1,426 @@
+1. Authentication APIs
+Login User
+
+Endpoint: POST /api/auth/login
+
+Description: Login for Admin and Doctor users.
+Request:
+{
+"email": "admin@eyenova.com",
+"password": "password123"
+}
+Response:
+{
+"message": "Login successful",
+"token": "jwt_token",
+"user": { "role": "admin" }
+}
+
+Register User
+--------------------------------------------
+Endpoint: POST /api/auth/register
+
+Description: Create Admin or Doctor.
+{
+"name": "Doctor",
+"email": "doctor@eyenova.com",
+"password": "doctor123",
+"role": : "doctor"
+}
+
+---------------------------------------
+View Doctor/admin Profile:
+
+Endpoint: POST /api/users/profile
+Description: Update Doctor Details with JWT bearer token.
+
+{
+  "name": "Dr. Alan Grant (Senior)",
+  "experienceYears": 15
+}
+
+
+Response:
+
+{
+    "success": true,
+    "message": "Profile updated successfully",
+    "data": {
+        "_id": "69d3b53565c044249b2aea49",
+        "name": "Dr. Alan Grant (Senior)",
+        "email": "alan@eyenova.com",
+        "role": "doctor",
+        "phoneNumber": "+1-555-0198",
+        "specialization": "Retina Specialist",
+        "qualifications": "MBBS, MD (Ophthalmology)",
+        "experienceYears": 15,
+        "consultationFee": 800
+    }
+}
+
+------------------------------------------
+
+All Doctor list:
+
+Endpoint:  GET /api/admin/doctors
+Description: To see all doctor list at admin panel, login with admin first, then copy jwt token of this a header authorization bearer token, then run the api
+
+Response:
+{
+    "success": true,
+    "count": 3,
+    "data": [
+        {
+            "specialization": "",
+            "qualifications": "",
+            "experienceYears": 0,
+            "consultationFee": 0,
+            "phoneNumber": "",
+            "_id": "69d39ddccf1f5a889e1075e2",
+            "name": "Dr. Sarah Jenkins",
+            "email": "sarah.jenkins@eyenova.com",
+            "role": "doctor",
+            "isActive": true,
+            "createdAt": "2026-04-06T11:49:48.595Z",
+            "updatedAt": "2026-04-06T11:49:48.595Z",
+            "__v": 0
+        },
+        {
+            "specialization": "",
+            "qualifications": "",
+            "experienceYears": 0,
+            "consultationFee": 0,
+            "phoneNumber": "",
+            "_id": "69d3b2daa5540e7317a40cf1",
+            "name": "Dr. Tashim Navin",
+            "email": "tashim.navin@eyenova.com",
+            "role": "doctor",
+            "isActive": true,
+            "createdAt": "2026-04-06T13:19:22.319Z",
+            "updatedAt": "2026-04-06T13:19:22.319Z",
+            "__v": 0
+        },
+        {
+            "_id": "69d3b53565c044249b2aea49",
+            "name": "Dr. Alan Grant (Senior)",
+            "email": "alan@eyenova.com",
+            "role": "doctor",
+            "isActive": true,
+            "specialization": "Retina Specialist",
+            "qualifications": "MBBS, MD (Ophthalmology)",
+            "experienceYears": 15,
+            "consultationFee": 800,
+            "phoneNumber": "+1-555-0198",
+            "createdAt": "2026-04-06T13:29:25.456Z",
+            "updatedAt": "2026-04-06T13:43:10.503Z",
+            "__v": 0
+        }
+    ]
+}
+
+------------------------------------------
+
+Specific Doctor view:
+
+Endpoint:  GET /api/admin/doctors/:id
+Description: To see specific doctor  at admin panel, login with admin first, then copy jwt token of this a header authorization bearer token, then run the api
+
+Response:
+
+{
+    "success": true,
+    "data": {
+        "_id": "69d3b53565c044249b2aea49",
+        "name": "Dr. Alan Grant (Senior)",
+        "email": "alan@eyenova.com",
+        "role": "doctor",
+        "isActive": true,
+        "specialization": "Retina Specialist",
+        "qualifications": "MBBS, MD (Ophthalmology)",
+        "experienceYears": 15,
+        "consultationFee": 800,
+        "phoneNumber": "+1-555-0198",
+        "createdAt": "2026-04-06T13:29:25.456Z",
+        "updatedAt": "2026-04-06T13:43:10.503Z",
+        "__v": 0
+    }
+}
+
+
+---------------------------------
+
+Patient add
+
+Endpoint:  POST /api/patients
+Description: To add new patients
+
+add raw body with admin jwt token using json code:
+
+{
+  "name": "John Doe",
+  "age": 45,
+  "gender": "Male",
+  "phone": "555-9876",
+  "address": "123 Main St, Springfield",
+  "medicalHistory": "Diabetes Type 2"
+}
+
+Response:
+
+{
+    "success": true,
+    "data": {
+        "name": "John Doe",
+        "age": 45,
+        "gender": "Male",
+        "phone": "555-9876",
+        "address": "123 Main St, Springfield",
+        "medicalHistory": "Diabetes Type 2",
+        "registeredBy": "69d39cb4cf1f5a889e1075e1",
+        "_id": "69d3d451a1349309fa78138f",
+        "createdAt": "2026-04-06T15:42:09.717Z",
+        "updatedAt": "2026-04-06T15:42:09.717Z",
+        "__v": 0
+    }
+}
+
+
+---------------------------------
+
+Patient list
+
+Endpoint:  GET /api/patients
+Description: To see all the patients
+
+using admin jwt token using json code:
+
+Response:
+{
+    "success": true,
+    "count": 2,
+    "data": [
+        {
+            "_id": "69d3d451a1349309fa78138f",
+            "name": "John Doe",
+            "age": 45,
+            "gender": "Male",
+            "phone": "555-9876",
+            "address": "123 Main St, Springfield",
+            "medicalHistory": "Diabetes Type 2",
+            "registeredBy": {
+                "_id": "69d39cb4cf1f5a889e1075e1",
+                "name": "Super Admin",
+                "email": "admin@eyenova.com",
+                "role": "admin"
+            },
+            "createdAt": "2026-04-06T15:42:09.717Z",
+            "updatedAt": "2026-04-06T15:42:09.717Z",
+            "__v": 0
+        },
+        {
+            "_id": "69d3d56ba1349309fa781391",
+            "name": "Nishan Raj",
+            "age": 35,
+            "gender": "Female",
+            "phone": "456783456",
+            "address": "New Joursey",
+            "medicalHistory": "Thiroid",
+            "registeredBy": {
+                "_id": "69d39cb4cf1f5a889e1075e1",
+                "name": "Super Admin",
+                "email": "admin@eyenova.com",
+                "role": "admin"
+            },
+            "createdAt": "2026-04-06T15:46:51.062Z",
+            "updatedAt": "2026-04-06T15:46:51.062Z",
+            "__v": 0
+        }
+    ]
+}
+
+
+---------------------------------
+
+Show one Patient
+
+Endpoint:  GET api/patients/:id
+Description: To see a specific patient
+using admin jwt token using json code:
+
+Response:
+
+{
+    "success": true,
+    "data": {
+        "_id": "69d3d56ba1349309fa781391",
+        "name": "Nishan Raj",
+        "age": 35,
+        "gender": "Female",
+        "phone": "456783456",
+        "address": "New Joursey",
+        "medicalHistory": "Thiroid",
+        "registeredBy": {
+            "_id": "69d39cb4cf1f5a889e1075e1",
+            "name": "Super Admin",
+            "email": "admin@eyenova.com",
+            "role": "admin"
+        },
+        "createdAt": "2026-04-06T15:46:51.062Z",
+        "updatedAt": "2026-04-06T15:46:51.062Z",
+        "__v": 0
+    }
+}
+
+---------------------------------
+
+Patient Update
+
+Endpoint:  PUT /api/patients/:id
+
+Description: To update a specific patient
+add raw body with modified data using admin jwt token using json code:
+
+{
+  "age": 48,  
+  "medicalHistory": "Diabetes Type 2, Pressure"
+}
+
+Response:
+
+{
+    "success": true,
+    "message": "Patient updated successfully",
+    "data": {
+        "_id": "69d3d451a1349309fa78138f",
+        "name": "John Doe",
+        "age": 48,
+        "gender": "Male",
+        "phone": "555-9876",
+        "address": "123 Main St, Springfield",
+        "medicalHistory": "Diabetes Type 2, Pressure",
+        "registeredBy": "69d39cb4cf1f5a889e1075e1",
+        "createdAt": "2026-04-06T15:42:09.717Z",
+        "updatedAt": "2026-04-06T15:58:59.758Z",
+        "__v": 0
+    }
+}
+
+--------------------------------
+
+Endpoint: POST /api/appointments 
+Description: Create a new appointment for a patient and assign it to a specific doctor. Automatically triggers Notification logging. 
+
+Request Headers:
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+
+Request Body:
+
+{
+  "patientId": "65b2a1c2e4b09c1234567890",
+  "doctorId": "65b2a1c2e4b09c1234567891",
+  "appointmentDate": "2026-04-10",
+  "timeSlot": "09:30 AM",
+  "reason": "Routine eye checkup"
+}
+
+Response:
+
+{
+  "success": true,
+  "data": {
+    "status": "Scheduled",
+    "patient": "65b2a1c2e4b09c1234567890",
+    "doctor": "65b2a1c2e4b09c1234567891",
+    "appointmentDate": "2026-04-10T00:00:00.000Z",
+    "timeSlot": "09:30 AM",
+    "reason": "Routine eye checkup",
+    "createdBy": "65b2a1c2e4b09c1234567899",
+    "_id": "65b2f1c2e4b11c9876543210",
+    "createdAt": "2026-04-06T12:00:00.000Z",
+    "updatedAt": "2026-04-06T12:00:00.000Z"
+  }
+}
+
+-------------------------------
+
+
+Endpoint: GET /api/appointments 
+
+Description: Fetch all appointments. If the caller is an Admin, it returns all system appointments. If the caller is a Doctor, it automatically filters and returns only their assigned appointments. 
+
+Request Headers:
+
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+
+Request Body: (Empty) Response:
+
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "65b2f1c2e4b11c9876543210",
+      "status": "Scheduled",
+      "patient": {
+        "_id": "65b2a1c2e4b09c1234567890",
+        "name": "Jane Doe",
+        "phone": "555-0192",
+        "email": "jane@example.com",
+        "gender": "Female"
+      },
+      "doctor": {
+        "_id": "65b2a1c2e4b09c1234567891",
+        "name": "Dr. Smith",
+        "specialization": "Optometrist"
+      },
+      "appointmentDate": "2026-04-10T00:00:00.000Z",
+      "timeSlot": "09:30 AM",
+      "reason": "Routine eye checkup",
+      "createdBy": "65b2a1c2e4b09c1234567899",
+      "createdAt": "2026-04-06T12:00:00.000Z",
+      "updatedAt": "2026-04-06T12:00:00.000Z"
+    }
+  ]
+}
+
+-----------------------------
+
+Endpoint: PUT /api/appointments/:id
+Description: Update the status of an appointment (e.g., mark it as 'Completed' or 'Cancelled') or modify the time/reason.
+
+Request Headers:
+
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+Request Body:
+{
+  "status": "Completed"
+}
+
+Response:
+
+{
+  "success": true,
+  "data": {
+    "status": "Completed",
+    "patient": "65b2a1c2e4b09c1234567890",
+    "doctor": "65b2a1c2e4b09c1234567891",
+    "appointmentDate": "2026-04-10T00:00:00.000Z",
+    "timeSlot": "09:30 AM",
+    "reason": "Routine eye checkup",
+    "createdBy": "65b2a1c2e4b09c1234567899",
+    "_id": "65b2f1c2e4b11c9876543210",
+    "createdAt": "2026-04-06T12:00:00.000Z",
+    "updatedAt": "2026-04-06T12:15:00.000Z"
+  }
+}
+
+
+

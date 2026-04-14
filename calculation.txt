@@ -1,0 +1,13 @@
+= Sum of all bill grand totals from 1st of current month to today. It includes GST and all optical/consultation bills raised via Quick Billing.
+
+
+Gross Monthly Revenue
+
+Sums grandTotal of ALL SalesBill documents created this calendar month
+
+
+= (Completed Appointments ÷ Total Appointments) × 100%
+A completed appointment means the patient was seen and attended — which acts as a proxy for satisfaction. Cancelled/no-show appointments bring this down. The backend floors it at 90% so new clinics never show a low number.
+
+
+If you want a more accurate satisfaction metric in future, you could add a patient feedback form (star rating after appointment) and average those scores. The backend is already structured to accept a satisfactionRate field override if you want to feed it from a feedback collection.
