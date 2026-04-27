@@ -30,6 +30,7 @@ const userSchema = mongoose.Schema(
         experienceYears: { type: Number, default: 0 },
         consultationFee: { type: Number, default: 0 },
         phoneNumber: { type: String, default: '' },
+        registrationNumber: { type: String, default: '' },
     },
     {
         // Mongoose automatically manages createdAt and updatedAt fields with this option

@@ -76,7 +76,7 @@ const getAppointments = async (req, res) => {
     }
     
     const appointments = await Appointment.find(query)
-      .populate('patient', 'name phone email gender')
+      .populate('patient', 'name phone email gender age address')
       .populate('doctor', 'name specialization')
       .sort({ createdAt: -1 }); // Sort chronologically (latest first)
       

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { BarChart, Users, Calendar, Download, TrendingUp, UserCheck, Loader } from 'lucide-react';
+import { BarChart, Users, Calendar, Download, TrendingUp, UserCheck, Loader, ShoppingCart } from 'lucide-react';
 
 
 const ReportsPage = () => {
@@ -122,6 +122,24 @@ const ReportsPage = () => {
                         <h4 style={{ marginTop: '1.25rem', fontSize: '1.2rem' }}>Doctor Performance</h4>
                         <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '0.5rem' }}>
                             Aggregate stats on patient volume and fees collected per doctor.
+                        </p>
+                    </div>
+                )}
+
+                {/* Purchase History - Admin & Accountant */}
+                {(user?.role === 'admin' || user?.role === 'accountant') && (
+                    <div className="report-card glass-card" style={{ padding: '1.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ background: '#fdf2f2', padding: '0.75rem', borderRadius: '12px' }}>
+                                <ShoppingCart size={24} color="#ef4444" />
+                            </div>
+                            <button className="btn-primary small" onClick={() => openReport('purchases')}>
+                                <Download size={16} /> PDF
+                            </button>
+                        </div>
+                        <h4 style={{ marginTop: '1.25rem', fontSize: '1.2rem' }}>Purchase History</h4>
+                        <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '0.5rem' }}>
+                            Summary of all inventory purchases and vendor payments.
                         </p>
                     </div>
                 )}

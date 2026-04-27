@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { sendCredentialsEmail } = require('../utils/notifier');
 
 // @desc    Get all doctors
 // @route   GET /api/admin/doctors
@@ -43,9 +44,15 @@ const createUser = async (req, res) => {
             specialization, qualifications, experienceYears, consultationFee, phoneNumber
         });
 
+        // Send login credentials to the new user's email
+        // password is the plain-text value from req.body (before bcrypt hash)
+        sendCredentialsEmail(email, name, role, password).catch(err => {
+            console.error('[ADMIN] Failed to send credentials email:', err.message);
+        });
+
         res.status(201).json({
             success: true,
-            message: 'User created successfully',
+            message: 'User created successfully. Login credentials have been sent to their email.',
             data: { _id: user._id, name: user.name, email: user.email, role: user.role }
         });
     } catch (error) {

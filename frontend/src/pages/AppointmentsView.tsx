@@ -84,7 +84,7 @@ const AppointmentsView = () => {
                     <div style={{ fontWeight: 500 }}>{appt.patient?.name}</div>
                     <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{appt.patient?.phone}</div>
                   </td>
-                  {user?.role === 'admin' && <td>Dr. {appt.doctor?.name}</td>}
+                  {user?.role === 'admin' && <td>{appt.doctor?.name?.match(/^Dr\.?\s+/i) ? appt.doctor.name : `Dr. ${appt.doctor?.name}`}</td>}
                   <td style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {appt.reason || '-'}
                   </td>
@@ -106,24 +106,8 @@ const AppointmentsView = () => {
                      <button 
                        className="btn-secondary" 
                        style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                       onClick={async () => {
-                         if (appt.status === 'Completed') {
-                           try {
-                             const config = { headers: { Authorization: `Bearer ${token}` } };
-                             const { data } = await axios.get(`/api/prescriptions/appointment/${appt._id}`, config);
-                             if (data.data) {
-                               window.open(`${axios.defaults.baseURL || ''}/api/prescriptions/${data.data._id}/pdf?token=${token}`, '_blank');
-                             } else {
-
-                               alert('Prescription data not found.');
-                             }
-                           } catch (err) {
-                             console.error(err);
-                             alert('Failed to load prescription PDF.');
-                           }
-                         } else {
-                           navigate(`/dashboard/prescription/${appt._id}`);
-                         }
+                       onClick={() => {
+                         navigate(`/dashboard/prescription/${appt._id}`);
                        }}
                      >
                        <FileText size={14} /> 

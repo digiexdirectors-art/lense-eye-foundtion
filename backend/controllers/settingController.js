@@ -24,7 +24,10 @@ exports.getSettings = async (req, res) => {
 // @access  Private (Admin Only)
 exports.updateSettings = async (req, res) => {
     try {
-        const { clinicName, tagline, phone, email, address, gstin, logoUrl } = req.body;
+        const { 
+            clinicName, tagline, phone, email, address, gstin, logoUrl,
+            smtpHost, smtpPort, smtpUser, smtpPass, smsApiKey
+        } = req.body;
         
         let settings = await Setting.findOne();
         
@@ -37,11 +40,18 @@ exports.updateSettings = async (req, res) => {
             settings.address = address;
             settings.gstin = gstin;
             settings.logoUrl = logoUrl;
+            // SMTP & SMS fields
+            if (smtpHost !== undefined) settings.smtpHost = smtpHost;
+            if (smtpPort !== undefined) settings.smtpPort = smtpPort;
+            if (smtpUser !== undefined) settings.smtpUser = smtpUser;
+            if (smtpPass !== undefined) settings.smtpPass = smtpPass;
+            if (smsApiKey !== undefined) settings.smsApiKey = smsApiKey;
             await settings.save();
         } else {
             // Create new
             settings = await Setting.create({
-                clinicName, tagline, phone, email, address, gstin, logoUrl
+                clinicName, tagline, phone, email, address, gstin, logoUrl,
+                smtpHost, smtpPort, smtpUser, smtpPass, smsApiKey
             });
         }
         

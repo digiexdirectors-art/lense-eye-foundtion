@@ -9,6 +9,11 @@ interface Settings {
   address: string;
   gstin: string;
   logoUrl: string;
+  smtpHost: string;
+  smtpPort: number;
+  smtpUser: string;
+  smtpPass: string;
+  smsApiKey: string;
 }
 
 interface SettingsContextType {
@@ -27,7 +32,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     email: '',
     address: '',
     gstin: '',
-    logoUrl: ''
+    logoUrl: '',
+    smtpHost: '',
+    smtpPort: 587,
+    smtpUser: '',
+    smtpPass: '',
+    smsApiKey: ''
   });
   const [loading, setLoading] = useState(true);
 

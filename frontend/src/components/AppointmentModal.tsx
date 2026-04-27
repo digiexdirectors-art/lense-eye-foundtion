@@ -110,7 +110,9 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ isOpen, onClose, on
                   <select className="form-input" required value={formData.doctorId} onChange={e => setFormData({...formData, doctorId: e.target.value})}>
                     <option value="" disabled>-- Select Doctor --</option>
                     {doctors.filter(d => d.isActive).map(d => (
-                      <option key={d._id} value={d._id}>Dr. {d.name} ({d.specialization || 'General'})</option>
+                      <option key={d._id} value={d._id}>
+                        {d.name.toLowerCase().match(/^dr\.?\s+/) ? d.name : `Dr. ${d.name}`} ({d.specialization || 'General'})
+                      </option>
                     ))}
                   </select>
                 </div>

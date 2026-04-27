@@ -1,6 +1,7 @@
 const PurchaseInvoice = require("../models/PurchaseInvoice");
 const Inventory = require("../models/Inventory");
 const { calculateGST } = require("../utils/gstHelper");
+const { generatePurchasePDF } = require("../utils/pdfGenerator");
 
 exports.createPurchase = async (req, res) => {
     try {
@@ -64,5 +65,33 @@ exports.createPurchase = async (req, res) => {
     } catch (err) {
         console.error("Purchase error:", err);
         res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Get all purchase invoices
+// @route   GET /api/purchases
+// @access  Private (Admin/Accountant)
+exports.getPurchases = async (req, res) => {
+    try {
+        const purchases = await PurchaseInvoice.find().sort({ createdAt: -1 });
+        res.json({ success: true, data: purchases });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// @desc    Get purchase invoice PDF
+// @route   GET /api/purchases/:id/pdf
+// @access  Private
+exports.getPurchasePDF = async (req, res) => {
+    try {
+        const purchase = await PurchaseInvoice.findById(req.params.id);
+        if (!purchase) {
+            return res.status(404).json({ success: false, message: "Purchase not found" });
+        }
+        await generatePurchasePDF(res, purchase);
+    } catch (err) {
+        console.error("PDF Error:", err);
+        res.status(500).json({ success: false, message: "Server Error" });
     }
 };

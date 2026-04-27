@@ -5,6 +5,7 @@ const {
     getPatientReport, 
     getAppointmentReport, 
     getSalesReport,
+    getPurchaseReport,
     getDoctorStats,
     getGlobalStats 
 } = require('../controllers/reportController');
@@ -14,6 +15,7 @@ router.get('/doctors', protect, admin, getDoctorReport);
 router.get('/patients', protect, admin, getPatientReport);
 router.get('/appointments', protect, authorize('admin', 'doctor', 'receptionist'), getAppointmentReport);
 router.get('/sales', protect, authorize('admin', 'accountant'), getSalesReport);
+router.get('/purchases', protect, authorize('admin', 'accountant'), getPurchaseReport);
 router.get('/doctor-stats', protect, authorize('doctor', 'admin'), getDoctorStats);
 router.get('/global-stats', protect, authorize('admin', 'accountant', 'doctor'), getGlobalStats);
 

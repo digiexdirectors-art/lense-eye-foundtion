@@ -115,6 +115,28 @@ exports.getSalesReport = async (req, res) => {
     }
 };
 
+// @desc    Generate Vendor Purchase Report
+// @route   GET /api/reports/purchases
+exports.getPurchaseReport = async (req, res) => {
+    try {
+        const purchases = await PurchaseInvoice.find().sort({ createdAt: -1 });
+        const rows = purchases.map(p => [
+            new Date(p.createdAt).toLocaleDateString(),
+            p.invoiceNumber || '-',
+            p.vendorName,
+            p.vendorGST || '-',
+            `INR ${p.subTotal.toFixed(2)}`,
+            `INR ${(p.cgstTotal + p.sgstTotal).toFixed(2)}`,
+            `INR ${p.grandTotal.toFixed(2)}`
+        ]);
+
+        const headers = ['Date', 'Inv No', 'Vendor', 'GSTIN', 'Subtotal', 'GST', 'Grand Total'];
+        generateTabularReportPDF(res, "Vendor Purchase Report", headers, rows);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
 // @desc    Get individual doctor statistics (Revenue, Consultation, Satisfaction)
 // @route   GET /api/reports/doctor-stats
 exports.getDoctorStats = async (req, res) => {

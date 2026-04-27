@@ -24,6 +24,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, isOpen, onClose, onSuccess,
     experienceYears: '',
     consultationFee: '',
     phoneNumber: '',
+    registrationNumber: '',
     isActive: true
   });
   const [loading, setLoading] = useState(false);
@@ -41,12 +42,13 @@ const UserModal: React.FC<UserModalProps> = ({ user, isOpen, onClose, onSuccess,
         experienceYears: user.experienceYears || '',
         consultationFee: user.consultationFee || '',
         phoneNumber: user.phoneNumber || '',
+        registrationNumber: user.registrationNumber || '',
         isActive: user.isActive !== undefined ? user.isActive : true
       });
     } else {
       setFormData({
         name: '', email: '', password: '', role: initialRole, specialization: '',
-        qualifications: '', experienceYears: '', consultationFee: '', phoneNumber: '', isActive: true
+        qualifications: '', experienceYears: '', consultationFee: '', phoneNumber: '', registrationNumber: '', isActive: true
       });
     }
   }, [user, isOpen, initialRole]);
@@ -142,6 +144,11 @@ const UserModal: React.FC<UserModalProps> = ({ user, isOpen, onClose, onSuccess,
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label>Consultation Fee (Rs.)</label>
                     <input type="number" className="form-input" value={formData.consultationFee} onChange={e => setFormData({...formData, consultationFee: e.target.value})} />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label>Regd. No.</label>
+                    <input type="text" className="form-input" value={formData.registrationNumber} onChange={e => setFormData({...formData, registrationNumber: e.target.value})} placeholder="e.g. MCI-1234" />
                   </div>
                 </div>
               )}

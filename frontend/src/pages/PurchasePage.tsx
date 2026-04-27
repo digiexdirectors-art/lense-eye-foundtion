@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { ShoppingCart, Plus, Trash2, Save, User as VendorIcon, Package } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, Save, User as VendorIcon, Package, Printer, FileText, Download } from 'lucide-react';
 
 const PurchasePage = () => {
   const { token } = useAuth();
@@ -9,6 +9,8 @@ const PurchasePage = () => {
   const [vendorGST, setVendorGST] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [items, setItems] = useState<any[]>([]);
+  const [recentPurchases, setRecentPurchases] = useState<any[]>([]);
+  const [lastSavedId, setLastSavedId] = useState<string | null>(null);
 
   // Local state for current item being added
   const [newItem, setNewItem] = useState({
@@ -21,6 +23,20 @@ const PurchasePage = () => {
     qty: 1,
     gstPercent: 18,
     category: 'Frame'
+  });
+
+  const fetchRecentPurchases = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const { data } = await axios.get('/api/purchases', config);
+      setRecentPurchases(data.data.slice(0, 5)); // Show last 5
+    } catch (error) {
+      console.error("Failed to fetch recent purchases", error);
+    }
+  };
+
+  useState(() => {
+    fetchRecentPurchases();
   });
 
   // Calculation logic
@@ -96,8 +112,10 @@ const PurchasePage = () => {
         items
       };
       
-      await axios.post('/api/purchases', purchaseData, config);
+      const { data } = await axios.post('/api/purchases', purchaseData, config);
       alert('Purchase recorded and inventory updated!');
+      setLastSavedId(data.data._id);
+      fetchRecentPurchases();
       
       // Reset
       setItems([]);
@@ -107,6 +125,11 @@ const PurchasePage = () => {
     } catch (error: any) {
       alert(error.response?.data?.message || 'Failed to record purchase.');
     }
+  };
+
+  const handleDownloadPDF = (id: string) => {
+    const url = `/api/purchases/${id}/pdf?token=${token}`;
+    window.open(`${axios.defaults.baseURL || ''}${url}`, '_blank');
   };
 
   return (
@@ -229,7 +252,49 @@ const PurchasePage = () => {
             <button className="btn-primary" style={{ marginTop: '1rem' }} onClick={handleSubmit}>
               <Save size={18} /> Record Purchase & Update Inventory
             </button>
+            
+            {lastSavedId && (
+              <button className="btn-secondary" style={{ marginTop: '0.5rem', borderColor: '#16a34a', color: '#16a34a' }} onClick={() => handleDownloadPDF(lastSavedId)}>
+                <Printer size={18} /> Print Last Saved Invoice
+              </button>
+            )}
          </div>
+      </div>
+
+      {/* Recent Purchases History */}
+      <div className="glass-card" style={{ marginTop: '2.5rem', padding: '1.5rem' }}>
+        <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <FileText size={18} /> Recent Purchase Invoices
+        </h3>
+        <div className="table-container" style={{ margin: 0, boxShadow: 'none' }}>
+           <table>
+             <thead>
+               <tr>
+                 <th>Date</th>
+                 <th>Invoice #</th>
+                 <th>Vendor</th>
+                 <th>Total Amount</th>
+                 <th>Action</th>
+               </tr>
+             </thead>
+             <tbody>
+               {recentPurchases.map((p) => (
+                 <tr key={p._id}>
+                   <td>{new Date(p.createdAt).toLocaleDateString()}</td>
+                   <td>{p.invoiceNumber}</td>
+                   <td>{p.vendorName}</td>
+                   <td>₹{p.grandTotal.toFixed(2)}</td>
+                   <td>
+                      <button className="btn-secondary small" onClick={() => handleDownloadPDF(p._id)} style={{ padding: '0.25rem 0.5rem' }}>
+                        <Download size={14} /> PDF
+                      </button>
+                   </td>
+                 </tr>
+               ))}
+               {recentPurchases.length === 0 && <tr><td colSpan={5} style={{ textAlign: 'center', color: '#94a3b8' }}>No recent purchases found.</td></tr>}
+             </tbody>
+           </table>
+        </div>
       </div>
     </div>
   );
