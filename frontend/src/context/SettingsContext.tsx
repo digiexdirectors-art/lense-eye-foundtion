@@ -9,6 +9,7 @@ interface Settings {
   address: string;
   gstin: string;
   logoUrl: string;
+  appointmentHours: string;
   smtpHost: string;
   smtpPort: number;
   smtpUser: string;
@@ -26,13 +27,14 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<Settings>({
-    clinicName: 'EYE NOVA',
-    tagline: 'PREMIUM EYE CARE & OPTICALS',
+    clinicName: '',
+    tagline: '',
     phone: '',
     email: '',
     address: '',
     gstin: '',
     logoUrl: '',
+    appointmentHours: 'Mon-Sat: 9:00AM - 6:00 PM',
     smtpHost: '',
     smtpPort: 587,
     smtpUser: '',
@@ -44,9 +46,11 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const fetchSettings = async () => {
     try {
       const { data } = await axios.get('/api/settings');
-      setSettings(data);
+      if (data) {
+        setSettings(prev => ({ ...prev, ...data }));
+      }
     } catch (error) {
-      console.error('Failed to fetch settings', error);
+      console.error('Failed to fetch settings, using defaults.', error);
     } finally {
       setLoading(false);
     }
@@ -59,17 +63,16 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Update Browser Tab Title and Favicon dynamically
   useEffect(() => {
     if (settings.clinicName) {
-      document.title = `${settings.clinicName} | Eye Clinic Management`;
+      document.title = `${settings.clinicName} | Clinic Management`;
+    } else {
+      document.title = 'Clinic Management';
     }
 
     if (settings.logoUrl) {
-      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
-      if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.getElementsByTagName('head')[0].appendChild(link);
+      const link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
+      if (link) {
+        link.href = settings.logoUrl;
       }
-      link.href = settings.logoUrl;
     }
   }, [settings]);
 

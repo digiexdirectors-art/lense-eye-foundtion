@@ -18,8 +18,10 @@ const createAdmin = async () => {
         let user = await User.findOne({ email });
 
         if (user) {
-            console.log('User already exists, updating password...');
+            console.log('User already exists, updating password and status...');
             user.password = password;
+            user.isActive = true;
+            user.role = 'admin'; // Ensure it's still admin
             await user.save();
         } else {
             console.log('Creating new admin user...');

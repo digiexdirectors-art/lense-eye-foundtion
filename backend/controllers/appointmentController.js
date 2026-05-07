@@ -76,7 +76,7 @@ const getAppointments = async (req, res) => {
     }
     
     const appointments = await Appointment.find(query)
-      .populate('patient', 'name phone email gender age address')
+      .populate('patient', 'name phone email gender age address mrdNumber purpose regdBy')
       .populate('doctor', 'name specialization')
       .sort({ createdAt: -1 }); // Sort chronologically (latest first)
       
@@ -107,4 +107,21 @@ const updateAppointment = async (req, res) => {
   }
 };
 
-module.exports = { createAppointment, getAppointments, updateAppointment };
+// @desc    Get single appointment
+// @route   GET /api/appointments/:id
+// @access  Private
+const getAppointmentById = async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id)
+      .populate('patient')
+      .populate('doctor');
+      
+    if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
+    
+    res.json({ success: true, data: appointment });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+module.exports = { createAppointment, getAppointments, updateAppointment, getAppointmentById };

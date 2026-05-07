@@ -7,9 +7,21 @@ const eyeDataSchema = mongoose.Schema({
 }, { _id: false });
 
 const optTestSchema = mongoose.Schema({
-  acid: { type: String, default: '' },
+  acd: { type: String, default: '' },
   pupillaryReaction: { type: String, default: '' },
   eom: { type: String, default: '' }
+}, { _id: false });
+
+const spectacleSchema = mongoose.Schema({
+  sph: { type: String, default: '' },
+  cyl: { type: String, default: '' },
+  axis: { type: String, default: '' },
+  va: { type: String, default: '' }
+}, { _id: false });
+
+const examinationSchema = mongoose.Schema({
+  anteriorSegment: { type: String, default: '' },
+  posteriorSegment: { type: String, default: '' }
 }, { _id: false });
 
 const prescriptionSchema = mongoose.Schema({
@@ -34,9 +46,17 @@ const prescriptionSchema = mongoose.Schema({
   pastHistory: { type: String, default: '' },
   rightEye: eyeDataSchema,
   leftEye: eyeDataSchema,
-  optTest: {
+  optTest: { // We'll keep the key 'optTest' but label it 'OPD Test' in UI
     rightEye: optTestSchema,
     leftEye: optTestSchema
+  },
+  spectaclePrescription: {
+    rightEye: spectacleSchema,
+    leftEye: spectacleSchema
+  },
+  examinationFinding: {
+    rightEye: examinationSchema,
+    leftEye: examinationSchema
   },
   diagnosis: { type: String, default: '' },
   medications: [{
@@ -49,7 +69,15 @@ const prescriptionSchema = mongoose.Schema({
   recommendations: { type: String, default: '' },
   prescriptionDate: { type: Date, default: Date.now },
   nextReviewDate: { type: String, default: '' },
-  nextReviewNote: { type: String, default: '' }
+  nextReviewNote: { type: String, default: '' },
+  glassPrescription: {
+    material: { type: String, default: '' },
+    category: { type: String, default: '' },
+    product: { type: String, default: '' },
+    usage: { type: String, default: '' },
+    remarks: { type: String, default: '' },
+    glassType: { type: String, default: '' }
+  }
 }, { timestamps: true });
 
 const Prescription = mongoose.model('Prescription', prescriptionSchema);

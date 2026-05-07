@@ -5,7 +5,21 @@ const Patient = require('../models/Patient');
 // @access  Private (Admin or Doctor)
 const createPatient = async (req, res) => {
     try {
-        const { name, age, gender, phone, address, medicalHistory } = req.body;
+        const { name, age, gender, phone, address, medicalHistory, purpose, refdBy } = req.body;
+
+        // Auto-generate mrdNumber if not provided
+        let mrdNumber = req.body.mrdNumber;
+        if (!mrdNumber) {
+            const lastPatient = await Patient.findOne({ mrdNumber: { $exists: true, $ne: null } }).sort({ createdAt: -1 });
+            mrdNumber = '000001';
+            if (lastPatient && lastPatient.mrdNumber) {
+                const lastMrdStr = String(lastPatient.mrdNumber);
+                const lastMrdNum = parseInt(lastMrdStr.replace(/\D/g, ''), 10);
+                if (!isNaN(lastMrdNum)) {
+                    mrdNumber = String(lastMrdNum + 1).padStart(6, '0');
+                }
+            }
+        }
 
         const patient = await Patient.create({
             name,
@@ -14,6 +28,9 @@ const createPatient = async (req, res) => {
             phone,
             address,
             medicalHistory,
+            mrdNumber,
+            purpose,
+            refdBy,
             // The protect middleware sets req.user to whoever made this request!
             registeredBy: req.user._id, 
         });
@@ -76,6 +93,11 @@ const updatePatient = async (req, res) => {
             patient.phone = req.body.phone || patient.phone;
             patient.address = req.body.address || patient.address;
             patient.medicalHistory = req.body.medicalHistory || patient.medicalHistory;
+            patient.purpose = req.body.purpose || patient.purpose;
+            patient.refdBy = req.body.refdBy || req.body.regdBy || patient.refdBy;
+            if (req.body.mrdNumber) {
+                patient.mrdNumber = req.body.mrdNumber;
+            }
 
             const updatedPatient = await patient.save();
 

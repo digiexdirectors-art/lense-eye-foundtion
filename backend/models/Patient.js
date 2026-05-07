@@ -25,6 +25,15 @@ const patientSchema = mongoose.Schema(
         medicalHistory: {
             type: String,
         },
+        mrdNumber: {
+            type: String,
+        },
+        purpose: {
+            type: String,
+        },
+        refdBy: {
+            type: String,
+        },
         registeredBy: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,

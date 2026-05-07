@@ -89,32 +89,68 @@ const AppointmentsView = () => {
                     {appt.reason || '-'}
                   </td>
                    <td>{getStatusBadge(appt.status)}</td>
-                   <td style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                     {appt.status === 'Scheduled' && (
-                       <select 
-                         className="form-input" 
-                         style={{ padding: '0.25rem 0.5rem', fontSize: '0.85rem', width: 'auto', display: 'inline-block' }}
-                         value="" 
-                         onChange={(e) => handleStatusChange(appt._id, e.target.value)}
-                       >
-                         <option value="" disabled>Update...</option>
-                         <option value="Completed">Mark Completed</option>
-                         <option value="Cancelled">Cancel Appt</option>
-                       </select>
-                     )}
-                     
-                     <button 
-                       className="btn-secondary" 
-                       style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                       onClick={() => {
-                         navigate(`/dashboard/prescription/${appt._id}`);
-                       }}
-                     >
-                       <FileText size={14} /> 
-                       {appt.status === 'Completed' ? 'View/Print Rx' : 'Create Rx'}
-                     </button>
+                    <td style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '220px' }}>
+                      {appt.status === 'Scheduled' && (
+                        <select 
+                          className="form-input" 
+                          style={{ padding: '0.25rem 0.5rem', fontSize: '0.85rem', width: '100%', display: 'inline-block', marginBottom: '0.25rem' }}
+                          value="" 
+                          onChange={(e) => handleStatusChange(appt._id, e.target.value)}
+                        >
+                          <option value="" disabled>Update Status...</option>
+                          <option value="Completed">Mark Completed</option>
+                          <option value="Cancelled">Cancel Appt</option>
+                        </select>
+                      )}
+                      
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button 
+                          className="btn-secondary" 
+                          style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem', flex: 1, whiteSpace: 'nowrap' }}
+                          onClick={() => {
+                            navigate(`/dashboard/prescription/${appt._id}`);
+                          }}
+                        >
+                          <FileText size={14} /> 
+                          {appt.status === 'Completed' ? 'View/Print Rx' : 'Create Rx'}
+                        </button>
 
-                  </td>
+                        <button 
+                          className="btn-secondary" 
+                          style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem', borderColor: '#8b5cf6', color: '#8b5cf6', flex: 1, whiteSpace: 'nowrap' }}
+                          onClick={() => {
+                            navigate(`/dashboard/glass-prescription/${appt._id}`);
+                          }}
+                        >
+                          <FileText size={14} /> 
+                          Glass Rx
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button 
+                          className="btn-secondary" 
+                          style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem', borderColor: '#f59e0b', color: '#f59e0b', flex: 1, whiteSpace: 'nowrap' }}
+                          onClick={() => {
+                            navigate(`/dashboard/registration-bill/${appt._id}`);
+                          }}
+                        >
+                          <FileText size={14} /> 
+                          Reg. Bill
+                        </button>
+
+                        <button 
+                          className="btn-secondary" 
+                          style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem', borderColor: '#10b981', color: '#10b981', flex: 1, whiteSpace: 'nowrap' }}
+                          onClick={() => {
+                            navigate(`/dashboard/bill-cum-receipt/${appt._id}`);
+                          }}
+                        >
+                          <FileText size={14} /> 
+                          Bill Cum Receipt
+                        </button>
+                      </div>
+                    </td>
                 </tr>
               ))}
               {appointments.length === 0 && (

@@ -8,10 +8,11 @@ const { generatePrescriptionPDF } = require('../utils/pdfGenerator');
 const createPrescription = async (req, res) => {
   const { 
     appointmentId, rightEye, leftEye, optTest,
+    spectaclePrescription, examinationFinding,
     chiefComplaints, generalHealth, pastHistory,
     diagnosis, medications, comments, notes, 
     suggestedLens, recommendations, prescriptionDate,
-    nextReviewDate, nextReviewNote 
+    nextReviewDate, nextReviewNote, glassPrescription
   } = req.body;
 
   try {
@@ -29,6 +30,8 @@ const createPrescription = async (req, res) => {
       prescription.rightEye = rightEye;
       prescription.leftEye = leftEye;
       prescription.optTest = optTest;
+      prescription.spectaclePrescription = spectaclePrescription;
+      prescription.examinationFinding = examinationFinding;
       prescription.chiefComplaints = chiefComplaints;
       prescription.generalHealth = generalHealth;
       prescription.pastHistory = pastHistory;
@@ -41,6 +44,7 @@ const createPrescription = async (req, res) => {
       prescription.prescriptionDate = prescriptionDate || prescription.prescriptionDate;
       prescription.nextReviewDate = nextReviewDate;
       prescription.nextReviewNote = nextReviewNote;
+      prescription.glassPrescription = glassPrescription || prescription.glassPrescription;
       await prescription.save();
     } else {
       // Create new
@@ -51,6 +55,8 @@ const createPrescription = async (req, res) => {
         rightEye,
         leftEye,
         optTest,
+        spectaclePrescription,
+        examinationFinding,
         chiefComplaints,
         generalHealth,
         pastHistory,
@@ -62,7 +68,8 @@ const createPrescription = async (req, res) => {
         recommendations,
         prescriptionDate: prescriptionDate || new Date(),
         nextReviewDate,
-        nextReviewNote
+        nextReviewNote,
+        glassPrescription
       });
       
       // Auto-update appointment status to Completed when prescription is generated
@@ -72,7 +79,7 @@ const createPrescription = async (req, res) => {
 
     // Return populated data so frontend can print immediately
     const populatedPrescription = await Prescription.findById(prescription._id)
-      .populate('patient', 'name age gender phone address')
+      .populate('patient', 'name age gender phone address mrdNumber purpose regdBy')
       .populate('doctor', 'name specialization qualifications registrationNumber');
 
     res.status(201).json({ success: true, data: populatedPrescription });
@@ -88,7 +95,7 @@ const createPrescription = async (req, res) => {
 const getPrescriptionByAppointmentId = async (req, res) => {
   try {
     const prescription = await Prescription.findOne({ appointment: req.params.appointmentId })
-      .populate('patient', 'name age gender phone address')
+      .populate('patient', 'name age gender phone address mrdNumber purpose regdBy')
       .populate('doctor', 'name specialization qualifications registrationNumber')
       .populate('appointment', 'appointmentDate timeSlot reason');
       
@@ -109,7 +116,7 @@ const getPrescriptionByAppointmentId = async (req, res) => {
 const getPrescriptionPDF = async (req, res) => {
   try {
     const prescription = await Prescription.findById(req.params.id)
-      .populate('patient', 'name age gender phone address')
+      .populate('patient', 'name age gender phone address mrdNumber purpose regdBy')
       .populate('doctor', 'name specialization qualifications registrationNumber')
       .populate('appointment', 'appointmentDate timeSlot reason');
       

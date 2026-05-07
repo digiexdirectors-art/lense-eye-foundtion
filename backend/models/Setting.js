@@ -8,6 +8,7 @@ const settingSchema = new mongoose.Schema({
     address: { type: String, default: '' },
     gstin: { type: String, default: '' },
     logoUrl: { type: String, default: '' },
+    appointmentHours: { type: String, default: 'Mon-Sat: 9:00AM - 6:00 PM' },
     // SMTP Email Configuration
     smtpHost: { type: String, default: '' },
     smtpPort: { type: Number, default: 587 },

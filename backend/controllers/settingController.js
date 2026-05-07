@@ -26,7 +26,7 @@ exports.updateSettings = async (req, res) => {
     try {
         const { 
             clinicName, tagline, phone, email, address, gstin, logoUrl,
-            smtpHost, smtpPort, smtpUser, smtpPass, smsApiKey
+            smtpHost, smtpPort, smtpUser, smtpPass, smsApiKey, appointmentHours
         } = req.body;
         
         let settings = await Setting.findOne();
@@ -46,12 +46,13 @@ exports.updateSettings = async (req, res) => {
             if (smtpUser !== undefined) settings.smtpUser = smtpUser;
             if (smtpPass !== undefined) settings.smtpPass = smtpPass;
             if (smsApiKey !== undefined) settings.smsApiKey = smsApiKey;
+            if (appointmentHours !== undefined) settings.appointmentHours = appointmentHours;
             await settings.save();
         } else {
             // Create new
             settings = await Setting.create({
                 clinicName, tagline, phone, email, address, gstin, logoUrl,
-                smtpHost, smtpPort, smtpUser, smtpPass, smsApiKey
+                smtpHost, smtpPort, smtpUser, smtpPass, smsApiKey, appointmentHours
             });
         }
         

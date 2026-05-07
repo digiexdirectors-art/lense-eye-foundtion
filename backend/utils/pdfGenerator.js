@@ -27,70 +27,104 @@ const axios = require("axios");
 const { getBranding } = require("./branding");
 
 // Helper to draw a header
-const drawHeader = async (doc, title, customDate = null) => {
-    const branding = await getBranding();
+const drawHeaderInternal = (doc, branding, logoBuffer, title, customDate, pageWidth) => {
     const primaryColor = "#1e40af"; 
-    const bgColor = "#e0f2fe"; // Light Blue
-    
-    const pageWidth = doc.page.width;
+    const bgColor = "#e0f2fe"; 
     
     // 1. Full Light Blue Background for Header area
-    doc.fillColor(bgColor).rect(0, 0, pageWidth, 130).fill();
-    
-    // Top Brand Accent
+    doc.fillColor(bgColor).rect(0, 0, pageWidth, 100).fill();
     doc.fillColor(primaryColor).rect(0, 0, pageWidth, 5).fill();
 
     const headerTop = 20;
+    let textLeftOffset = 40;
 
     // 2. Logo on the LEFT
+    if (logoBuffer) {
+        try {
+            doc.image(logoBuffer, 40, headerTop, { fit: [150, 80], align: 'left' });
+            textLeftOffset = 200;
+        } catch (err) {
+            console.error("[PDF LOG] Failed to draw logo image:", err.message);
+        }
+    }
+
+    // 3. Clinic Name on the LEFT
+    doc.fillColor(primaryColor)
+       .font("Helvetica-Bold")
+       .fontSize(18)
+       .text(branding.clinicName.toUpperCase(), textLeftOffset, headerTop + 10, { width: 250 });
+       
+    doc.fillColor("#475569")
+       .font("Helvetica-Bold")
+       .fontSize(10)
+       .text(title.toUpperCase(), textLeftOffset, headerTop + 40, { width: 250 });
+
+    // 4. Contact Details on the RIGHT
+    const rightMargin = pageWidth - 40;
+    doc.fillColor(primaryColor)
+       .font("Helvetica-Bold")
+       .fontSize(8)
+       .text("For Appointment:", 0, headerTop - 5, { align: "right", width: rightMargin })
+       .text(branding.appointmentHours || "Mon-Sat: 9:00AM - 6:00 PM", 0, headerTop + 4, { align: "right", width: rightMargin });
+
+    let addrY = headerTop + 14;
+    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(8);
+    if (branding.address) {
+        branding.address.split('\n').forEach(line => {
+            doc.text(line.toUpperCase(), 0, addrY, { align: "right", width: rightMargin });
+            addrY += 9;
+        });
+    }
+    
+    doc.font("Helvetica")
+       .fontSize(7.5)
+       .text(`Tel: ${branding.phone || '-'}`, 0, addrY + 2, { align: "right", width: rightMargin })
+       .text(`Email: ${branding.email || '-'}`, 0, addrY + 11, { align: "right", width: rightMargin });
+
+    doc.fillColor(primaryColor)
+       .font("Helvetica-Bold")
+       .fontSize(9)
+       .text(`GSTIN: ${branding.gstin || '-'}`, 0, addrY + 24, { align: "right", width: rightMargin });
+
+    // Border line below header
+    doc.strokeColor(primaryColor).lineWidth(3).moveTo(0, 100).lineTo(pageWidth, 100).stroke();
+
+    // 6. Meta Headers (Doc No, Date)
+    const metaY = 110;
+    doc.fillColor("#334155").font("Helvetica").fontSize(8);
+    doc.text(`Doc No: ${Date.now().toString().slice(-6)}`, pageWidth - 200, metaY, { align: "right", width: 160 });
+    const displayDate = customDate ? new Date(customDate).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN');
+    doc.text(`Date: ${displayDate}`, pageWidth - 200, metaY + 10, { align: "right", width: 160 });
+
+    doc.y = 140; 
+};
+
+const drawHeader = async (doc, title, customDate = null) => {
+    const branding = await getBranding();
+    const pageWidth = doc.page.width;
+    let logoBuffer = null;
+
     if (branding.logoUrl) {
         try {
             if (branding.logoUrl.startsWith('data:image')) {
                 const base64Data = branding.logoUrl.split(',')[1];
-                const buffer = Buffer.from(base64Data, 'base64');
-                doc.image(buffer, 40, headerTop + 10, { fit: [200, 90], align: 'left' });
+                logoBuffer = Buffer.from(base64Data, 'base64');
             } else {
                 const response = await axios.get(branding.logoUrl, { responseType: 'arraybuffer' });
-                doc.image(response.data, 40, headerTop + 10, { fit: [200, 90], align: 'left' });
+                logoBuffer = response.data;
             }
         } catch (err) {
-            console.error("[PDF LOG] Failed to fetch/parse logo image:", err.message);
+            console.error("[PDF LOG] Failed to fetch logo:", err.message);
         }
     }
 
-    // 3. Right Aligned Branding (Match UI exactly)
-    doc.fillColor("#1e40af")
-       .font("Helvetica-BoldOblique")
-       .fontSize(20)
-       .text(branding.clinicName, 0, headerTop + 15, { align: "right", width: pageWidth - 40 });
-       
-    doc.fillColor("#0f172a")
-       .font("Helvetica")
-       .fontSize(10)
-       .text(branding.address || '', 0, headerTop + 40, { align: "right", width: pageWidth - 40 });
-    
-    const contactLine = [
-        branding.phone ? `Tel: ${branding.phone}` : '',
-        branding.email ? `Email: ${branding.email}` : '',
-        branding.gstin ? `GSTIN: ${branding.gstin}` : ''
-    ].filter(Boolean).join(' | ');
+    // Initial page header
+    drawHeaderInternal(doc, branding, logoBuffer, title, customDate, pageWidth);
 
-    doc.fontSize(9)
-       .text(contactLine, 0, headerTop + 55, { align: "right", width: pageWidth - 40 });
-
-    // Border line below header
-    doc.strokeColor(primaryColor).lineWidth(3).moveTo(0, 130).lineTo(pageWidth, 130).stroke();
-
-    // 6. Meta Headers (Title, Doc No, Date)
-    const metaY = 145;
-    doc.fillColor(primaryColor).font("Helvetica-Bold").fontSize(14).text(title, 40, metaY);
-    
-    doc.fillColor("#334155").font("Helvetica").fontSize(9);
-    doc.text(`Doc No: ${Date.now().toString().slice(-6)}`, pageWidth - 200, metaY, { align: "right", width: 160 });
-    const displayDate = customDate ? new Date(customDate).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN');
-    doc.text(`Date: ${displayDate}`, pageWidth - 200, metaY + 12, { align: "right", width: 160 });
-
-    doc.moveDown(2);
+    // Repeat on every new page
+    doc.on('pageAdded', () => {
+        drawHeaderInternal(doc, branding, logoBuffer, title, customDate, pageWidth);
+    });
 };
 
 exports.generateBillPDF = async (res, bill) => {
@@ -230,20 +264,46 @@ exports.generatePrescriptionPDF = async (res, prescription) => {
     const doctor = prescription.doctor;
     const docName = doctor?.name ? (doctor.name.toLowerCase().match(/^dr\.?\s+/) ? doctor.name : `Dr. ${doctor.name}`) : '';
 
-    // Patient & Doctor Info Card
+    // 3-Column Patient & Doctor Info Section
     const cardY = doc.y + 10;
-    doc.rect(50, cardY, 512, 60).fillColor("#f8fafc").fill().strokeColor("#e2e8f0").lineWidth(0.5).stroke();
+    doc.rect(40, cardY, 520, 70).fillColor("#f8fafc").fill().strokeColor("#e2e8f0").lineWidth(0.5).stroke();
     
-    doc.fillColor("#111827").font("Helvetica-Bold").fontSize(9);
-    doc.text("PATIENT INFORMATION", 65, cardY + 12);
-    doc.text("CONSULTING DOCTOR", 350, cardY + 12);
+    doc.fillColor("#64748b").font("Helvetica-Bold").fontSize(8);
     
-    doc.fillColor("#4b5563").font("Helvetica").fontSize(9)
-       .text(`Name: ${prescription.patient?.name}`, 65, cardY + 28)
-       .text(`Age/Sex: ${prescription.patient?.age || '-'} / ${prescription.patient?.gender || '-'}`, 65, cardY + 42)
-       .text(docName, 350, cardY + 28);
+    // Column 1
+    doc.text("MRD NO:", 50, cardY + 12);
+    doc.text("MOBILE NO:", 50, cardY + 30);
+    doc.text("DOCTOR:", 50, cardY + 48);
 
-    let currentY = cardY + 75;
+    doc.fillColor("#111827").font("Helvetica-Bold").fontSize(9);
+    doc.text(prescription.patient?.mrdNumber || "-", 110, cardY + 12);
+    doc.text(prescription.patient?.phone || "-", 110, cardY + 30);
+    doc.text(docName, 110, cardY + 48);
+
+    // Column 2
+    doc.fillColor("#64748b").font("Helvetica-Bold").fontSize(8);
+    doc.text("PATIENT NAME:", 220, cardY + 12);
+    doc.text("DATE:", 220, cardY + 30);
+    doc.text("PURPOSE:", 220, cardY + 48);
+
+    doc.fillColor("#111827").font("Helvetica-Bold").fontSize(9);
+    doc.text(prescription.patient?.name || "-", 300, cardY + 12);
+    const pDate = prescription.prescriptionDate ? new Date(prescription.prescriptionDate).toLocaleDateString('en-IN') : "-";
+    doc.text(pDate, 300, cardY + 30);
+    doc.text(prescription.patient?.purpose || "-", 300, cardY + 48);
+
+    // Column 3
+    doc.fillColor("#64748b").font("Helvetica-Bold").fontSize(8);
+    doc.text("ADDRESS:", 390, cardY + 12);
+    doc.text("REFD. BY:", 390, cardY + 30);
+    doc.text("AGE/SEX:", 390, cardY + 48);
+
+    doc.fillColor("#111827").font("Helvetica-Bold").fontSize(9);
+    doc.text(prescription.patient?.address || "-", 450, cardY + 12, { width: 100 });
+    doc.text(prescription.patient?.refdBy || prescription.patient?.regdBy || "-", 450, cardY + 30);
+    doc.text(`${prescription.patient?.age || "-"} / ${prescription.patient?.gender || "-"}`, 450, cardY + 48);
+
+    let currentY = cardY + 80;
 
     // History section
     if (prescription.chiefComplaints || prescription.generalHealth || prescription.pastHistory) {
@@ -282,16 +342,49 @@ exports.generatePrescriptionPDF = async (res, prescription) => {
 
     currentY = tableTop + 70;
 
-    // OPT tests
+    // OPD tests
     if (prescription.optTest && (prescription.optTest.leftEye || prescription.optTest.rightEye)) {
-        doc.fillColor("#111827").font("Helvetica-Bold").fontSize(9).text("OPT Test", 50, currentY);
+        doc.fillColor("#111827").font("Helvetica-Bold").fontSize(9).text("OPD Test", 50, currentY);
         currentY += 15;
         doc.fillColor("#4b5563").font("Helvetica").fontSize(8);
-        doc.text(`Right Eye - ACID: ${prescription.optTest.rightEye?.acid || '-'} | Pupil. Rxn: ${prescription.optTest.rightEye?.pupillaryReaction || '-'} | EOM: ${prescription.optTest.rightEye?.eom || '-'}`, 50, currentY);
+        doc.text(`Right Eye - ACD: ${prescription.optTest.rightEye?.acd || '-'} | Pupillary Reaction: ${prescription.optTest.rightEye?.pupillaryReaction || '-'} | EOM: ${prescription.optTest.rightEye?.eom || '-'}`, 50, currentY);
         currentY += 12;
-        doc.text(`Left Eye - ACID: ${prescription.optTest.leftEye?.acid || '-'} | Pupil. Rxn: ${prescription.optTest.leftEye?.pupillaryReaction || '-'} | EOM: ${prescription.optTest.leftEye?.eom || '-'}`, 50, currentY);
-        currentY += 15;
+        doc.text(`Left Eye - ACD: ${prescription.optTest.leftEye?.acd || '-'} | Pupillary Reaction: ${prescription.optTest.leftEye?.pupillaryReaction || '-'} | EOM: ${prescription.optTest.leftEye?.eom || '-'}`, 50, currentY);
+        currentY += 20;
     }
+
+    // Spectacle Prescription Table
+    doc.fillColor("#1e40af").font("Helvetica-Bold").fontSize(10).text("Spectacle Prescription", 50, currentY);
+    currentY += 15;
+    const spectTableTop = currentY;
+    doc.fillColor("#f1f5f9").rect(50, spectTableTop - 5, 510, 20).fill();
+    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(8);
+    doc.text("EYE", 55, spectTableTop);
+    doc.text("SPH", 150, spectTableTop);
+    doc.text("CYL", 250, spectTableTop);
+    doc.text("AXIS", 350, spectTableTop);
+    doc.text("V/A", 450, spectTableTop);
+
+    const drawSpectRow = (label, data, y) => {
+        doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(8).text(label, 55, y);
+        doc.fillColor("#4b5563").font("Helvetica");
+        doc.text(data?.sph || "-", 150, y);
+        doc.text(data?.cyl || "-", 250, y);
+        doc.text(data?.axis || "-", 350, y);
+        doc.text(data?.va || "-", 450, y);
+    };
+    drawSpectRow("Right (O.D.)", prescription.spectaclePrescription?.rightEye, spectTableTop + 25);
+    drawSpectRow("Left (O.S.)", prescription.spectaclePrescription?.leftEye, spectTableTop + 45);
+    currentY = spectTableTop + 70;
+
+    // Examination Finding
+    doc.fillColor("#1e40af").font("Helvetica-Bold").fontSize(10).text("Examination Finding", 50, currentY);
+    currentY += 15;
+    doc.fillColor("#4b5563").font("Helvetica").fontSize(8);
+    doc.text(`Right Eye - Anterior Segment: ${prescription.examinationFinding?.rightEye?.anteriorSegment || '-'} | Posterior Segment: ${prescription.examinationFinding?.rightEye?.posteriorSegment || '-'}`, 50, currentY);
+    currentY += 12;
+    doc.text(`Left Eye - Anterior Segment: ${prescription.examinationFinding?.leftEye?.anteriorSegment || '-'} | Posterior Segment: ${prescription.examinationFinding?.leftEye?.posteriorSegment || '-'}`, 50, currentY);
+    currentY += 20;
 
     if (prescription.diagnosis) {
         doc.fillColor("#1e40af").font("Helvetica-Bold").fontSize(10).text("Diagnosis:", 50, currentY);
@@ -491,6 +584,92 @@ exports.generateTabularReportPDF = async (res, title, headers, rows, subtitle = 
     });
 
     doc.fontSize(8).fillColor("#94a3b8").text(`Generated on: ${new Date().toLocaleString()}`, 30, 570, { align: "right" });
+
+    doc.end();
+};
+
+exports.generateRegistrationBillPDF = async (res, bill) => {
+    const doc = new PDFDocument({ margin: 50, size: "A4" });
+    const branding = await getBranding();
+
+    // Build filename
+    const patientName = (bill.patient?.name || 'Patient').replace(/[^a-zA-Z0-9]/g, '_');
+    const receiptNoClean = bill.receiptNo.replace(/[^a-zA-Z0-9]/g, '-');
+    const pdfFilename = `RegBill-${patientName}-${receiptNoClean}.pdf`;
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename=${pdfFilename}`);
+    doc.pipe(res);
+
+    // Border
+    doc.rect(20, 20, 555, 800).strokeColor("#cbd5e1").lineWidth(1).stroke();
+
+    await drawHeader(doc, "BILL OF SUPPLY", bill.createdAt);
+
+    const pageWidth = doc.page.width;
+
+    // 1. Patient & Bill Info Section ( Branded Card)
+    const bodyY = 150;
+    doc.rect(40, bodyY - 10, 520, 85).fillColor("#f8fafc").fill().strokeColor("#e2e8f0").lineWidth(0.5).stroke();
+    
+    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(10);
+    
+    // Left Column
+    doc.fillColor("#64748b").fontSize(8).text("PATIENT NAME:", 55, bodyY);
+    doc.fillColor("#111827").fontSize(10).text(bill.patient?.name?.toUpperCase() || "-", 150, bodyY);
+
+    doc.fillColor("#64748b").fontSize(8).text("MRD NO:", 55, bodyY + 20);
+    doc.fillColor("#111827").fontSize(10).text(bill.patient?.mrdNumber || "-", 150, bodyY + 20);
+
+    doc.fillColor("#64748b").fontSize(8).text("ADDRESS:", 55, bodyY + 40);
+    doc.fillColor("#111827").fontSize(9).text(bill.patient?.address || "-", 150, bodyY + 40, { width: 220 });
+
+    doc.fillColor("#64748b").fontSize(8).text("DOCTOR NAME:", 55, bodyY + 60);
+    doc.fillColor("#111827").fontSize(10).text(bill.doctor?.name ? `DR. ${bill.doctor.name.toUpperCase()}` : "-", 150, bodyY + 60);
+
+    // Right Column
+    const rightLabelX = 380;
+    const rightValueX = 460;
+    doc.fillColor("#64748b").fontSize(8).text("DATE:", rightLabelX, bodyY);
+    doc.fillColor("#111827").fontSize(10).text(new Date(bill.createdAt).toLocaleDateString('en-IN'), rightValueX, bodyY);
+
+    doc.fillColor("#64748b").fontSize(8).text("RECEIPT NO:", rightLabelX, bodyY + 20);
+    doc.fillColor("#1e40af").font("Helvetica-Bold").fontSize(10).text(bill.receiptNo, rightValueX, bodyY + 20);
+
+    // 2. Billing Table
+    const tableTop = bodyY + 110;
+    doc.rect(40, tableTop, 520, 22).fillColor("#1e293b").fill();
+    doc.fillColor("#ffffff").font("Helvetica-Bold").fontSize(9);
+    doc.text("PARTICULARS / DESCRIPTION", 60, tableTop + 7);
+    doc.text("AMOUNT (INR)", 450, tableTop + 7, { width: 100, align: "right" });
+
+    // Item Row
+    doc.fillColor("#334155").font("Helvetica").fontSize(10).text("Patient Registration & Consultation Charges", 60, tableTop + 40);
+    doc.font("Helvetica-Bold").text(bill.amount.toFixed(2), 450, tableTop + 40, { width: 100, align: "right" });
+
+    // Divider
+    doc.strokeColor("#e2e8f0").lineWidth(1).moveTo(40, tableTop + 70).lineTo(560, tableTop + 70).stroke();
+
+    // 3. Totals section
+    const totalY = tableTop + 85;
+    doc.fillColor("#1e40af").font("Helvetica-Bold").fontSize(11).text("TOTAL PAYABLE:", 350, totalY);
+    doc.text(`INR ${bill.amount.toFixed(2)}`, 450, totalY, { width: 100, align: "right" });
+
+    // Amount in words Card
+    doc.rect(40, totalY + 30, 520, 40).fillColor("#f8fafc").fill().strokeColor("#e2e8f0").lineWidth(0.5).stroke();
+    doc.fillColor("#64748b").font("Helvetica").fontSize(8).text("Amount in words:", 50, totalY + 40);
+    doc.fillColor("#111827").font("Helvetica-Bold").fontSize(9).text(numberToWords(bill.amount), 50, totalY + 52, { width: 500 });
+
+    // Payment Mode
+    doc.fillColor("#475569").font("Helvetica-Bold").fontSize(9).text(`Payment Mode: ${bill.paymentMode.toUpperCase()}`, 40, totalY + 90);
+
+    // 4. Footer & Signature
+    const footerY = 650;
+    doc.strokeColor("#cbd5e1").lineWidth(0.5).moveTo(350, footerY + 50).lineTo(550, footerY + 50).stroke();
+    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(10).text(`FOR ${branding.clinicName.toUpperCase()}`, 350, footerY + 60, { width: 200, align: "center" });
+    doc.fillColor("#64748b").font("Helvetica").fontSize(8).text("(Authorized Signatory)", 350, footerY + 75, { width: 200, align: "center" });
+
+    doc.fontSize(8).fillColor("#94a3b8").text("This is a computer generated receipt and does not require a physical signature.", 40, 780, { align: "center" });
 
     doc.end();
 };

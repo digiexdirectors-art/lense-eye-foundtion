@@ -63,26 +63,30 @@ const PatientsView = () => {
           <table>
             <thead>
               <tr>
+                <th>MRD No.</th>
                 <th>Patient Name</th>
                 <th>Age & Gender</th>
                 <th>Phone Number</th>
+                <th>Purpose</th>
                 <th>Medical History</th>
-                <th>Registered By</th>
+                <th>Refd. By</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {patients.map((pat) => (
                 <tr key={pat._id}>
+                  <td style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>{pat.mrdNumber || '-'}</td>
                   <td style={{ fontWeight: 500 }}>{pat.name}</td>
                   <td>{pat.age} yrs • {pat.gender}</td>
                   <td>{pat.phone}</td>
+                  <td>{pat.purpose || '-'}</td>
                   <td style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {pat.medicalHistory || '-'}
                   </td>
                   <td>
                     <span className="badge role-doctor" style={{ margin: 0, padding: '0.2rem 0.5rem', background: '#f1f5f9', color: '#64748b' }}>
-                      {pat.registeredBy?.name || 'Unknown'}
+                      {pat.refdBy || pat.regdBy || '-'}
                     </span>
                   </td>
                   <td>
@@ -98,7 +102,7 @@ const PatientsView = () => {
               ))}
               {patients.length === 0 && (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>No patients registered yet. Click "Register Patient" to begin.</td>
+                  <td colSpan={8} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>No patients registered yet. Click "Register Patient" to begin.</td>
                 </tr>
               )}
             </tbody>

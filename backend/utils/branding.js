@@ -17,7 +17,8 @@ const getBranding = async () => {
                 phone: dbSettings.phone || "",
                 email: dbSettings.email || "",
                 gstin: dbSettings.gstin || "",
-                logoUrl: dbSettings.logoUrl || ""
+                logoUrl: dbSettings.logoUrl || "",
+                appointmentHours: dbSettings.appointmentHours || "Mon-Sat: 9:00AM - 6:00 PM"
             };
         }
     } catch (err) {
@@ -32,7 +33,8 @@ const getBranding = async () => {
         phone: clean(process.env.CLINIC_PHONE) || "",
         email: clean(process.env.CLINIC_EMAIL) || "",
         gstin: clean(process.env.CLINIC_GSTIN) || "",
-        logoUrl: clean(process.env.CLINIC_LOGO_URL) || ""
+        logoUrl: clean(process.env.CLINIC_LOGO_URL) || "",
+        appointmentHours: clean(process.env.CLINIC_APPOINTMENT_HOURS) || "Mon-Sat: 9:00AM - 6:00 PM"
     };
 };
 

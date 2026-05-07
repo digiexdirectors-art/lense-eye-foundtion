@@ -144,6 +144,17 @@ const SettingsPage = () => {
             />
           </div>
 
+          <div className="form-group">
+            <label className="form-label">Appointment Hours</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.appointmentHours}
+              onChange={(e) => setFormData({ ...formData, appointmentHours: e.target.value })}
+              placeholder="e.g. Mon-Sat: 9:00AM - 6:00 PM"
+            />
+          </div>
+
         </div>
 
         {/* Email & SMS Integration Section */}

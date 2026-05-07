@@ -1,0 +1,370 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { useSettings } from '../context/SettingsContext';
+import { FileText, Printer, ArrowLeft, Eye, Save } from 'lucide-react';
+
+const emptySpectacle = { sph: '', cyl: '', axis: '', va: '' };
+
+const GlassPrescriptionGenerator = () => {
+  const { id: appointmentId } = useParams();
+  const navigate = useNavigate();
+  const { token, user } = useAuth();
+  const { settings } = useSettings();
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [appointmentData, setAppointmentData] = useState<any>(null);
+  const [, setHasExisting] = useState(false);
+
+  const [formData, setFormData] = useState({
+    spectaclePrescription: {
+      rightEye: { ...emptySpectacle },
+      leftEye: { ...emptySpectacle }
+    },
+    glassPrescription: {
+      material: '',
+      category: '',
+      product: '',
+      usage: '',
+      remarks: '',
+      glassType: ''
+    },
+    prescriptionDate: ''
+  });
+
+  useEffect(() => {
+    const fetchContext = async () => {
+      try {
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+        
+        // 1. Try to fetch existing prescription
+        try {
+          const { data } = await axios.get(`/api/prescriptions/appointment/${appointmentId}`, config);
+          if (data.success && data.data) {
+            const rx = data.data;
+            const formatDate = (d: any) => {
+              if (!d) return '';
+              const date = new Date(d);
+              return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+            };
+
+            setFormData({
+              spectaclePrescription: {
+                rightEye: { ...emptySpectacle, ...(rx.spectaclePrescription?.rightEye || {}) },
+                leftEye: { ...emptySpectacle, ...(rx.spectaclePrescription?.leftEye || {}) }
+              },
+              glassPrescription: {
+                material: rx.glassPrescription?.material || '',
+                category: rx.glassPrescription?.category || '',
+                product: rx.glassPrescription?.product || '',
+                usage: rx.glassPrescription?.usage || '',
+                remarks: rx.glassPrescription?.remarks || '',
+                glassType: rx.glassPrescription?.glassType || ''
+              },
+              prescriptionDate: formatDate(rx.prescriptionDate)
+            });
+            setAppointmentData({
+              patient: rx.patient,
+              doctor: rx.doctor,
+              appointmentDate: rx.appointment?.appointmentDate || rx.createdAt
+            });
+            setHasExisting(true);
+            setLoading(false);
+            return;
+          }
+        } catch (rxErr) {
+          console.log("No existing prescription found or error fetching it.");
+        }
+
+        // 2. Fallback: Fetch appointment details directly if prescription doesn't exist
+        try {
+          const { data } = await axios.get(`/api/appointments/${appointmentId}`, config);
+          if (data.success && data.data) {
+            const appt = data.data;
+            const formatDate = (d: any) => {
+              if (!d) return '';
+              const date = new Date(d);
+              return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+            };
+            setAppointmentData(appt);
+            setFormData(prev => ({
+              ...prev,
+              prescriptionDate: formatDate(appt.appointmentDate) || new Date().toISOString().split('T')[0]
+            }));
+          }
+        } catch (apptErr) {
+          console.error("Error fetching appointment directly:", apptErr);
+          // 3. Last resort: Try list (older logic)
+          const apptRes = await axios.get('/api/appointments', config);
+          const appt = apptRes.data.data.find((a: any) => a._id === appointmentId);
+          if (appt) {
+            const formatDate = (d: any) => {
+              if (!d) return '';
+              const date = new Date(d);
+              return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+            };
+            setAppointmentData(appt);
+            setFormData(prev => ({
+              ...prev,
+              prescriptionDate: formatDate(appt.appointmentDate)
+            }));
+          }
+        }
+      } catch (err: any) {
+        console.error("Critical Glass Rx Load Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContext();
+  }, [appointmentId, token]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      // Note: We only update the relevant parts for glass prescription
+      // but the backend controller handles the merge
+      await axios.post('/api/prescriptions', { ...formData, appointmentId }, config);
+      alert('Glass Prescription successfully saved!');
+      setHasExisting(true);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to save glass prescription.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  if (loading) return <div style={{ padding: '2rem' }}>Loading interface...</div>;
+  if (!appointmentData) return <div style={{ padding: '2rem' }}>Error: Appointment data missing.</div>;
+
+  const patient = appointmentData.patient;
+  const doctor = user?.role === 'doctor' ? user : appointmentData.doctor;
+  const docName = doctor?.name ? (doctor.name.toLowerCase().match(/^dr\.?\s+/) ? doctor.name : `Dr. ${doctor.name}`) : '';
+
+  // Helper to show N/A for empty fields
+  const val = (v: any) => (v !== undefined && v !== null && String(v).trim() !== '') ? String(v) : 'N/A';
+
+  return (
+    <>
+      <div className="page-header print-hidden" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <FileText size={28} color="#8b5cf6" />
+          Glass Prescription
+        </h2>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button className="btn-secondary" onClick={() => navigate('/dashboard/appointments')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <ArrowLeft size={16} /> Back
+          </button>
+          <button className="btn-secondary" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: '#16a34a', color: '#16a34a' }}>
+            <Printer size={16} /> Print
+          </button>
+          <button className="btn-primary small" onClick={handleSave} disabled={saving} style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#8b5cf6', borderColor: '#8b5cf6' }}>
+            <Save size={16} /> {saving ? 'Saving...' : 'Save Glass Rx'}
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        @media print {
+          @page { 
+            size: auto; 
+            margin: 0 !important; 
+          }
+          .print-hidden { display: none !important; }
+          body { 
+            background: #fff !important; 
+            margin: 0 !important; 
+            padding: 0 !important;
+          }
+          .prescription-container { 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            max-width: 100% !important; 
+          }
+          .glass-card { 
+            box-shadow: none !important; 
+            padding: 15mm !important; 
+            margin: 0 !important; 
+            border: none !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            min-height: auto !important;
+            height: auto !important;
+            width: 100% !important;
+          }
+          .form-input { border: none !important; background: transparent !important; padding: 0 !important; font-size: 1rem !important; font-weight: 600 !important; }
+          .prescription-header { margin: 0 0 1rem 0 !important; border-radius: 0 !important; padding: 1.5rem !important; }
+          .print-only { display: block !important; }
+        }
+      `}</style>
+
+      <div className="glass-card" style={{ background: 'white', padding: '3rem', margin: 0, minHeight: '800px', border: '1px solid #e2e8f0' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <td style={{ border: 'none' }}>
+                <div className="prescription-header" style={{
+                  background: 'white',
+                  padding: '1rem 1.5rem',
+                  margin: '-3rem -3rem 1.5rem -3rem',
+                  borderBottom: '3px solid var(--primary-color)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div style={{ flex: 2, display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {settings.logoUrl ? (
+                      <img src={settings.logoUrl} alt="Logo" style={{ maxHeight: '80px', maxWidth: '160px', objectFit: 'contain' }} />
+                    ) : (
+                      <Eye size={40} color="var(--primary-color)" />
+                    )}
+                    <div>
+                      <h1 style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0, color: 'var(--primary-color)', textTransform: 'uppercase' }}>
+                        {settings.clinicName}
+                      </h1>
+                      <p style={{ margin: '0', fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                        Glass Prescription
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ flex: 1.2, textAlign: 'right', color: '#1e293b', fontSize: '0.75rem', lineHeight: '1.2' }}>
+                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--primary-color)' }}>For Appointment:</p>
+                    <p style={{ margin: '0 0 2px 0', fontWeight: 700, color: 'var(--primary-color)' }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+                    {settings.address && settings.address.split('\n').map((line: string, i: number) => (
+                      <p key={i} style={{ margin: 0, fontWeight: 700 }}>{line.toUpperCase()}</p>
+                    ))}
+                    <p style={{ margin: '2px 0 0 0' }}><b>Tel:</b> {settings.phone}</p>
+                    <p style={{ margin: 0 }}><b>Email:</b> {settings.email}</p>
+                    <p style={{ margin: '2px 0 0 0', fontWeight: 800, color: 'var(--primary-color)', fontSize: '0.9rem' }}>GSTIN: {settings.gstin}</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ border: 'none' }}>
+                {/* Patient Info Section */}
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: '1fr 1fr 1fr', 
+                  gap: '0.75rem', 
+                  borderBottom: '1px solid #e2e8f0', 
+                  paddingBottom: '0.5rem', 
+                  marginBottom: '1rem',
+                  fontSize: '0.8rem'
+                }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>MRD No:</span> <b style={{ color: '#8b5cf6' }}>{val(patient?.mrdNumber)}</b></div>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>Mobile:</span> <b>{val(patient?.phone)}</b></div>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>Doctor:</span> <b>{val(docName)}</b></div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>Patient:</span> <b style={{ fontSize: '1rem' }}>{patient?.name}</b></div>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>Date:</span> <b>{formData.prescriptionDate ? new Date(formData.prescriptionDate).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}</b></div>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>Purpose:</span> <b>{val(patient?.purpose)}</b></div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>Address:</span> <span style={{ fontSize: '0.8rem' }}>{val(patient?.address)}</span></div>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>Refd. By:</span> <b>{val(patient?.regdBy)}</b></div>
+                    <div><span style={{ color: '#64748b', fontWeight: 600 }}>Age/Sex:</span> <b>{val(patient?.age)} / {val(patient?.gender)}</b></div>
+                  </div>
+                </div>
+
+                {/* Spectacle Prescription Table */}
+                <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem', color: '#1e293b', borderLeft: '3px solid #8b5cf6', paddingLeft: '0.5rem' }}>Spectacle Prescription</h3>
+                <div className="table-container" style={{ margin: '0 0 1rem 0', boxShadow: 'none' }}>
+                  <table style={{ width: '100%', border: '1px solid #e2e8f0' }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc' }}>
+                        <th style={{ padding: '0.75rem' }}>Eye</th>
+                        <th>Sph</th>
+                        <th>Cyl</th>
+                        <th>Axis</th>
+                        <th>V/A</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {['rightEye', 'leftEye'].map((eye) => (
+                        <tr key={eye}>
+                          <td style={{ fontWeight: 700, padding: '0.75rem', background: '#f8fafc' }}>{eye === 'rightEye' ? 'RE (O.D.)' : 'LE (O.S.)'}</td>
+                          {['sph', 'cyl', 'axis', 'va'].map(field => (
+                            <td key={field} style={{ padding: '0.5rem' }}>
+                              <input 
+                                type="text" 
+                                className="form-input" 
+                                style={{ textAlign: 'center', width: '100%' }}
+                                value={(formData.spectaclePrescription as any)[eye][field]}
+                                placeholder="N/A"
+                                onChange={e => setFormData({
+                                  ...formData,
+                                  spectaclePrescription: {
+                                    ...formData.spectaclePrescription,
+                                    [eye]: { ...(formData.spectaclePrescription as any)[eye], [field]: e.target.value }
+                                  }
+                                })} 
+                              />
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Glass Customization Fields */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+                  {[
+                    { label: 'Material', field: 'material' },
+                    { label: 'Category', field: 'category' },
+                    { label: 'Product', field: 'product' },
+                    { label: 'Usage', field: 'usage' },
+                    { label: 'Remarks', field: 'remarks' },
+                    { label: 'Glass Type', field: 'glassType' }
+                  ].map(item => (
+                    <div key={item.field}>
+                      <label style={{ display: 'block', marginBottom: '0.2rem', fontWeight: 600, fontSize: '0.75rem', color: '#4b5563' }}>{item.label}</label>
+                      <input 
+                        type="text" 
+                        className="form-input" 
+                        style={{ fontSize: '0.85rem', padding: '0.2rem 0.4rem' }}
+                        value={(formData.glassPrescription as any)[item.field]} 
+                        onChange={e => setFormData({
+                          ...formData,
+                          glassPrescription: { ...formData.glassPrescription, [item.field]: e.target.value }
+                        })} 
+                        placeholder="N/A"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Signature Block */}
+                <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+                  <div style={{ textAlign: 'center', width: '220px' }}>
+                    <div style={{ borderBottom: '1px solid #1e293b', height: '30px' }}></div>
+                    <p style={{ marginTop: '0.5rem', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>{docName}</p>
+                    {doctor?.registrationNumber && <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem' }}>Regd: {doctor.registrationNumber}</p>}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+};
+
+export default GlassPrescriptionGenerator;
