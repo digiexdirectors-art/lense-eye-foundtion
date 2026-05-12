@@ -10,8 +10,7 @@ import {
   Eye,
   Plus,
   Trash2,
-  Save,
-  Download
+  Save
 } from 'lucide-react';
 
 const emptyEye = { pgvn: '', bcvn: '', nct: '', phvn: '' };
@@ -185,12 +184,12 @@ const PrescriptionGenerator = () => {
     }, 100);
   };
 
-  const handleDownload = () => {
-    window.open(
-      `/api/prescriptions/${appointmentId}/pdf`,
-      '_blank'
-    );
-  };
+  // const handleDownload = () => {
+  //   window.open(
+  //     `/api/prescriptions/${appointmentId}/pdf`,
+  //     '_blank'
+  //   );
+  // };
 
   const addMedication = () => {
     setFormData({

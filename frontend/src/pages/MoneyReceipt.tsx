@@ -10,10 +10,8 @@ const MoneyReceipt = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
   const { settings } = useSettings();
-  const [appointment, setAppointment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [receipt, setReceipt] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -30,12 +28,12 @@ const MoneyReceipt = () => {
       try {
         const config = { headers: { Authorization: `Bearer ${token}` } };
         const { data: apptData } = await axios.get(`/api/appointments/${id}`, config);
-        setAppointment(apptData.data);
+        // setAppointment(apptData.data);
         
         // Check for existing receipt
         try {
           const { data: receiptData } = await axios.get(`/api/billing/money-receipt/appointment/${id}`, config);
-          setReceipt(receiptData.data);
+          // setReceipt(receiptData.data);
           setFormData({
             name: receiptData.data.name || apptData.data.patient?.name || '',
             age: receiptData.data.age || apptData.data.patient?.age || '',
@@ -70,11 +68,11 @@ const MoneyReceipt = () => {
     setSaving(true);
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const { data } = await axios.post('/api/billing/money-receipt', {
+      await axios.post('/api/billing/money-receipt', {
         appointmentId: id,
         ...formData
       }, config);
-      setReceipt(data.data);
+        // setReceipt(data.data);
       alert("Receipt saved successfully!");
     } catch (error) {
       console.error("Failed to save receipt", error);
