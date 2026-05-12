@@ -7,7 +7,9 @@ const {
     createRegistrationBill, 
     getRegistrationBillByAppointment,
     createBillCumReceipt,
-    getBillCumReceiptByAppointment
+    getBillCumReceiptByAppointment,
+    createMoneyReceipt,
+    getMoneyReceiptByAppointment
 } = require('../controllers/billingController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
@@ -32,4 +34,9 @@ router.get('/registration/:id/pdf', protect, authorize('admin', 'receptionist', 
 router.post('/receipt', protect, authorize('admin', 'receptionist', 'accountant'), createBillCumReceipt);
 router.get('/receipt/appointment/:appointmentId', protect, authorize('admin', 'receptionist', 'accountant'), getBillCumReceiptByAppointment);
 
+// Money Receipt Routes
+router.post('/money-receipt', protect, authorize('admin', 'receptionist', 'accountant'), createMoneyReceipt);
+router.get('/money-receipt/appointment/:appointmentId', protect, authorize('admin', 'receptionist', 'accountant'), getMoneyReceiptByAppointment);
+
 module.exports = router;
+

@@ -78,39 +78,55 @@ const GlassPrescriptionGenerator = () => {
           console.log("No existing prescription found or error fetching it.");
         }
 
-        // 2. Fallback: Fetch appointment details directly if prescription doesn't exist
+        // 2. Fallback: Fetch appointment details AND check for patient's previous prescription
         try {
-          const { data } = await axios.get(`/api/appointments/${appointmentId}`, config);
-          if (data.success && data.data) {
-            const appt = data.data;
+          const { data: apptData } = await axios.get(`/api/appointments/${appointmentId}`, config);
+          if (apptData.success && apptData.data) {
+            const appt = apptData.data;
             const formatDate = (d: any) => {
               if (!d) return '';
               const date = new Date(d);
               return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
             };
             setAppointmentData(appt);
-            setFormData(prev => ({
-              ...prev,
-              prescriptionDate: formatDate(appt.appointmentDate) || new Date().toISOString().split('T')[0]
-            }));
+
+            // Check for previous prescription for this patient as a template
+            try {
+              const { data: prevRxRes } = await axios.get(`/api/prescriptions/patient/${appt.patient._id}/latest`, config);
+              if (prevRxRes.success && prevRxRes.data) {
+                const rx = prevRxRes.data;
+                // Load previous data but keep current appointment's context
+                setFormData(prev => ({
+                  ...prev,
+                  spectaclePrescription: {
+                    rightEye: { ...emptySpectacle, ...(rx.spectaclePrescription?.rightEye || {}) },
+                    leftEye: { ...emptySpectacle, ...(rx.spectaclePrescription?.leftEye || {}) }
+                  },
+                  glassPrescription: {
+                    material: rx.glassPrescription?.material || '',
+                    category: rx.glassPrescription?.category || '',
+                    product: rx.glassPrescription?.product || '',
+                    usage: rx.glassPrescription?.usage || '',
+                    remarks: rx.glassPrescription?.remarks || '',
+                    glassType: rx.glassPrescription?.glassType || ''
+                  },
+                  prescriptionDate: formatDate(appt.appointmentDate) || new Date().toISOString().split('T')[0]
+                }));
+              } else {
+                setFormData(prev => ({
+                  ...prev,
+                  prescriptionDate: formatDate(appt.appointmentDate) || new Date().toISOString().split('T')[0]
+                }));
+              }
+            } catch (prevErr) {
+              setFormData(prev => ({
+                ...prev,
+                prescriptionDate: formatDate(appt.appointmentDate) || new Date().toISOString().split('T')[0]
+              }));
+            }
           }
         } catch (apptErr) {
           console.error("Error fetching appointment directly:", apptErr);
-          // 3. Last resort: Try list (older logic)
-          const apptRes = await axios.get('/api/appointments', config);
-          const appt = apptRes.data.data.find((a: any) => a._id === appointmentId);
-          if (appt) {
-            const formatDate = (d: any) => {
-              if (!d) return '';
-              const date = new Date(d);
-              return isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
-            };
-            setAppointmentData(appt);
-            setFormData(prev => ({
-              ...prev,
-              prescriptionDate: formatDate(appt.appointmentDate)
-            }));
-          }
         }
       } catch (err: any) {
         console.error("Critical Glass Rx Load Error:", err);
@@ -175,38 +191,54 @@ const GlassPrescriptionGenerator = () => {
       <style>{`
         @media print {
           @page { 
-            size: auto; 
+            size: landscape; 
             margin: 0 !important; 
           }
           .print-hidden { display: none !important; }
-          body { 
-            background: #fff !important; 
+          html, body { 
             margin: 0 !important; 
             padding: 0 !important;
+            height: 100%;
+            overflow: hidden;
           }
           .prescription-container { 
             margin: 0 !important; 
             padding: 0 !important; 
-            max-width: 100% !important; 
+            width: 100% !important;
           }
           .glass-card { 
             box-shadow: none !important; 
-            padding: 15mm !important; 
+            padding: 10mm !important; 
             margin: 0 !important; 
             border: none !important;
+            width: 100% !important;
+            height: 100% !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            min-height: auto !important;
-            height: auto !important;
-            width: 100% !important;
+            overflow: hidden;
           }
-          .form-input { border: none !important; background: transparent !important; padding: 0 !important; font-size: 1rem !important; font-weight: 600 !important; }
-          .prescription-header { margin: 0 0 1rem 0 !important; border-radius: 0 !important; padding: 1.5rem !important; }
-          .print-only { display: block !important; }
+          thead { display: table-header-group; }
+          tbody { display: table-row-group; }
+          .form-input { border: none !important; background: transparent !important; padding: 0 !important; font-size: 0.9rem !important; font-weight: 600 !important; }
+          .prescription-header { 
+            margin: 0 0 0.5rem 0 !important; 
+            padding: 0.5rem 0 !important; 
+            border-bottom: 2px solid var(--primary-color) !important;
+            height: auto !important;
+          }
+          .prescription-header img { maxHeight: 50px !important; }
+          h1 { font-size: 1.2rem !important; }
+          h3 { margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; font-size: 0.9rem !important; }
+          .table-container { margin-bottom: 0.25rem !important; }
+          table { font-size: 0.85rem !important; }
+          th, td { padding: 4px !important; }
+          .signature-section { margin-top: 1rem !important; }
+          .important-message { margin-top: 0.5rem !important; padding-top: 0.25rem !important; }
+          .important-message p { font-size: 0.65rem !important; line-height: 1.2 !important; }
         }
       `}</style>
 
-      <div className="glass-card" style={{ background: 'white', padding: '3rem', margin: 0, minHeight: '800px', border: '1px solid #e2e8f0' }}>
+      <div className="glass-card" style={{ background: 'white', padding: '3rem', margin: 0, minHeight: '600px', border: '1px solid #e2e8f0' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
@@ -351,12 +383,26 @@ const GlassPrescriptionGenerator = () => {
                 </div>
 
                 {/* Signature Block */}
-                <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <div className="signature-section" style={{ marginTop: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div style={{ textAlign: 'center', width: '220px' }}>
-                    <div style={{ borderBottom: '1px solid #1e293b', height: '30px' }}></div>
-                    <p style={{ marginTop: '0.5rem', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>{docName}</p>
+                    <div style={{ borderBottom: '1px solid #1e293b', height: '40px', marginBottom: '0.5rem' }}></div>
+                    <p style={{ color: '#1e293b', fontWeight: 700, fontSize: '0.9rem', margin: 0 }}>OPTOMETRIST</p>
+                  </div>
+                  <div style={{ textAlign: 'center', width: '220px' }}>
+                    <div style={{ borderBottom: '1px solid #1e293b', height: '40px', marginBottom: '0.5rem' }}></div>
+                    <p style={{ color: '#1e293b', fontWeight: 700, fontSize: '0.9rem', margin: 0 }}>{docName}</p>
                     {doctor?.registrationNumber && <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem' }}>Regd: {doctor.registrationNumber}</p>}
                   </div>
+                </div>
+
+                {/* Important Message Section - Single instance at bottom */}
+                <div className="important-message" style={{ marginTop: '3rem', textAlign: 'left', borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: '0.75rem', color: '#1e293b' }}>IMPORTANT MESSAGE FOR PATIENTS & ATTENDANTS:</p>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.7rem', color: '#475569', lineHeight: '1.4', maxWidth: '800px' }}>
+                    Only one attendant is allowed with one patient in the hospital premisis. 
+                    Children are susceptible to infections, hence, discourage them to visit hospital unless they need any aye treatment. 
+                    Both parents may accompany in case of child patient.
+                  </p>
                 </div>
               </td>
             </tr>

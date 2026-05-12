@@ -15,6 +15,7 @@ import SettingsPage from './pages/SettingsPage';
 import GlassPrescriptionGenerator from './pages/GlassPrescriptionGenerator';
 import RegistrationBill from './pages/RegistrationBill';
 import BillCumReceipt from './pages/BillCumReceipt';
+import MoneyReceipt from './pages/MoneyReceipt';
 import ProtectedRoute from './components/ProtectedRoute';
 
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="glass-prescription/:id" element={<GlassPrescriptionGenerator />} />
             <Route path="registration-bill/:id" element={<RegistrationBill />} />
             <Route path="bill-cum-receipt/:id" element={<BillCumReceipt />} />
+            <Route path="money-receipt/:id" element={<MoneyReceipt />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="billing" element={<BillingPage />} />
             <Route path="purchases" element={<PurchasePage />} />

@@ -322,19 +322,20 @@ exports.generatePrescriptionPDF = async (res, prescription) => {
     const tableTop = currentY;
     
     doc.fillColor("#f1f5f9").rect(50, tableTop - 5, 510, 20).fill();
-    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(8);
+    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(9);
     doc.text("EYE", 55, tableTop);
     doc.text("PGVN", 180, tableTop);
     doc.text("BCVN", 300, tableTop);
-    doc.text("NCT", 420, tableTop);
+    doc.text("NCT", 380, tableTop);
+    doc.text("PHVN", 480, tableTop);
 
-    doc.font("Helvetica").fontSize(8);
     const drawRow = (label, data, y) => {
-        doc.fillColor("#1e293b").font("Helvetica-Bold").text(label, 55, y);
+        doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(9).text(label, 55, y);
         doc.fillColor("#4b5563").font("Helvetica");
         doc.text(data?.pgvn || "-", 180, y);
         doc.text(data?.bcvn || "-", 300, y);
-        doc.text(data?.nct || "-", 420, y);
+        doc.text(data?.nct || "-", 380, y);
+        doc.text(data?.phvn || "-", 480, y);
     };
 
     drawRow("Right (O.D.)", prescription.rightEye, tableTop + 25);
@@ -358,7 +359,7 @@ exports.generatePrescriptionPDF = async (res, prescription) => {
     currentY += 15;
     const spectTableTop = currentY;
     doc.fillColor("#f1f5f9").rect(50, spectTableTop - 5, 510, 20).fill();
-    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(8);
+    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(9);
     doc.text("EYE", 55, spectTableTop);
     doc.text("SPH", 150, spectTableTop);
     doc.text("CYL", 250, spectTableTop);
@@ -366,7 +367,7 @@ exports.generatePrescriptionPDF = async (res, prescription) => {
     doc.text("V/A", 450, spectTableTop);
 
     const drawSpectRow = (label, data, y) => {
-        doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(8).text(label, 55, y);
+        doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(9).text(label, 55, y);
         doc.fillColor("#4b5563").font("Helvetica");
         doc.text(data?.sph || "-", 150, y);
         doc.text(data?.cyl || "-", 250, y);

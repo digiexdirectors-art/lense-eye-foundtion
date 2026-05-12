@@ -206,8 +206,15 @@ const RegistrationBill = () => {
               <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>(Authorized Signatory)</p>
             </div>
           </div>
-          <div style={{ textAlign: 'center', marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '8px' }}>
-            <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8' }}>This is a computer generated receipt and does not require a physical signature.</p>
+          <div style={{ marginTop: '15px', textAlign: 'left', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+            <p style={{ margin: 0, fontSize: '0.7rem', color: '#1e293b', fontWeight: 700 }}>
+              PLEASE NOTE: Consultation/registration with the same doctor is valid for 30 days from the date of payment.
+            </p>
+            <p style={{ margin: '5px 0 0 0', fontSize: '0.65rem', color: '#475569', lineHeight: '1.4' }}>
+              <span style={{ fontWeight: 700, color: '#1e293b' }}>IMPORTANT MESSAGE FOR PATIENT & ATTENDANTS:</span> Only one attendant is allowed with one patient in the hospital premises. 
+              Children are susceptible to infections, hence, discourage them to visit hospital unless they need any eye treatment. 
+              Both parents may accompany in case of a child patient.
+            </p>
           </div>
         </div>
       </div>
@@ -239,8 +246,8 @@ const RegistrationBill = () => {
             border: none !important; 
             padding: 15mm !important; 
             margin: 0 !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            page-break-inside: auto !important;
+            break-inside: auto !important;
             min-height: auto !important;
             height: auto !important;
             width: 100% !important;

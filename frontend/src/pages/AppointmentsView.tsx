@@ -150,6 +150,19 @@ const AppointmentsView = () => {
                           Bill Cum Receipt
                         </button>
                       </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <button 
+                          className="btn-secondary" 
+                          style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', borderColor: '#ef4444', color: '#ef4444', width: '100%', maxWidth: '160px', whiteSpace: 'nowrap' }}
+                          onClick={() => {
+                            navigate(`/dashboard/money-receipt/${appt._id}`);
+                          }}
+                        >
+                          <FileText size={14} /> 
+                          Money Receipt
+                        </button>
+                      </div>
                     </td>
                 </tr>
               ))}

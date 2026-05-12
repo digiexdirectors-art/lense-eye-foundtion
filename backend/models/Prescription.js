@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const eyeDataSchema = mongoose.Schema({
   pgvn: { type: String, default: '' },
   bcvn: { type: String, default: '' },
-  nct: { type: String, default: '' }
+  nct: { type: String, default: '' },
+  phvn: { type: String, default: '' }
 }, { _id: false });
 
 const optTestSchema = mongoose.Schema({

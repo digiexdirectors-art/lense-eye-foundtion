@@ -106,7 +106,7 @@ const BillCumReceipt = () => {
         </div>
       </div>
 
-      <div className="prescription-paper" ref={printRef} style={{ display: 'flex', flexDirection: 'column', background: '#fff', padding: '40px', minHeight: '1050px', position: 'relative', border: '1px solid #e2e8f0', boxShadow: '0 5px 25px rgba(0,0,0,0.1)' }}>
+      <div className="prescription-paper" ref={printRef} style={{ display: 'flex', flexDirection: 'column', background: '#fff', padding: '40px', minHeight: '800px', position: 'relative', border: '1px solid #e2e8f0', boxShadow: '0 5px 25px rgba(0,0,0,0.1)' }}>
         {/* Header */}
         <div style={{ borderBottom: '3px solid var(--primary-color)', paddingBottom: '10px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -220,21 +220,33 @@ const BillCumReceipt = () => {
           </div>
         </div>
 
-        {/* Footer Signature Area */}
-        <div style={{ marginTop: 'auto', paddingBottom: '10px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px' }}>
-            <div style={{ textAlign: 'center', width: '200px' }}>
-              <div style={{ borderBottom: '1px solid #cbd5e1', marginBottom: '8px' }}></div>
-              <p style={{ margin: 0, fontWeight: 700, color: '#1e293b', fontSize: '0.8rem' }}>Patient/Attendant Signature</p>
-            </div>
-            <div style={{ textAlign: 'center', width: '220px' }}>
-              <p style={{ margin: '0 0 30px 0', fontWeight: 700, color: '#1e293b', fontSize: '0.85rem' }}>For {settings.clinicName?.toUpperCase() || 'THE LENS EYE FOUNDATION'}</p>
-              <div style={{ borderBottom: '1px solid #cbd5e1', marginBottom: '8px' }}></div>
-              <p style={{ margin: 0, fontWeight: 700, color: '#64748b', fontSize: '0.75rem' }}>Authorized Signature</p>
-            </div>
+        {/* Footer Section */}
+        <div style={{ marginTop: '20px', paddingBottom: '10px' }}>
+          {/* Note Section */}
+          <div style={{ marginBottom: '20px', textAlign: 'left', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#1e293b', fontWeight: 600, lineHeight: '1.5' }}>
+              <span style={{ fontWeight: 800 }}>PLEASE NOTE:</span> Follow-up or repeat consultation is free for upto 15 (Fifteen) days from the last doctor consultation date. 
+              Rs {displayData.amount.toFixed(2)} shall be charged subsequent OPD consultation after 15 days.
+            </p>
           </div>
-          <div style={{ textAlign: 'center', marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '8px' }}>
-            <p style={{ margin: 0, fontSize: '0.7rem', color: '#94a3b8' }}>This is a computer generated receipt and does not require a physical signature.</p>
+
+          {/* Signature Grid */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '20px' }}>
+            <div style={{ textAlign: 'center', width: '200px' }}>
+              <div style={{ borderBottom: '1.5px solid #1e293b', marginBottom: '8px' }}></div>
+              <p style={{ margin: 0, fontWeight: 700, color: '#1e293b', fontSize: '0.85rem' }}>Patient/Attendant Signature</p>
+            </div>
+
+            <div style={{ textAlign: 'center', width: '180px' }}>
+              <div style={{ borderBottom: '1.5px solid #1e293b', marginBottom: '8px' }}></div>
+              <p style={{ margin: 0, fontWeight: 700, color: '#1e293b', fontSize: '0.85rem' }}>Prepared By</p>
+            </div>
+
+            <div style={{ textAlign: 'center', width: '250px' }}>
+              <p style={{ margin: '0 0 40px 0', fontWeight: 800, color: '#1e293b', fontSize: '0.9rem' }}>For: {settings.clinicName?.toUpperCase() || 'THE LENS EYE FOUNDATION'}</p>
+              <div style={{ borderBottom: '1.5px solid #1e293b', marginBottom: '8px' }}></div>
+              <p style={{ margin: 0, fontWeight: 700, color: '#1e293b', fontSize: '0.85rem' }}>Authorized Signatory</p>
+            </div>
           </div>
         </div>
       </div>
@@ -265,8 +277,8 @@ const BillCumReceipt = () => {
             border: none !important; 
             padding: 15mm !important;
             margin: 0 !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            page-break-inside: auto !important;
+            break-inside: auto !important;
             min-height: auto !important;
             height: auto !important;
             width: 100% !important;

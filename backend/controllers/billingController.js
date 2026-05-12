@@ -1,6 +1,7 @@
 const SalesBill = require("../models/SalesBill");
 const RegistrationBill = require("../models/RegistrationBill");
 const BillCumReceipt = require("../models/BillCumReceipt");
+const MoneyReceipt = require("../models/MoneyReceipt");
 const Sequence = require("../models/Sequence");
 const Appointment = require("../models/Appointment");
 const Inventory = require("../models/Inventory");
@@ -227,6 +228,63 @@ exports.getBills = async (req, res) => {
             .limit(50);
             
         res.json({ success: true, count: bills.length, data: bills });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+exports.createMoneyReceipt = async (req, res) => {
+    try {
+        const { appointmentId, name, age, sex, receivedFrom, sumOfRupees, purpose, amount } = req.body;
+        
+        const appointment = await Appointment.findById(appointmentId).populate('patient');
+        if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
+
+        let receipt = await MoneyReceipt.findOne({ appointment: appointmentId });
+        
+        if (receipt) {
+            receipt.name = name;
+            receipt.age = age;
+            receipt.sex = sex;
+            receipt.receivedFrom = receivedFrom;
+            receipt.sumOfRupees = sumOfRupees;
+            receipt.purpose = purpose;
+            receipt.amount = amount;
+            await receipt.save();
+        } else {
+            let sequence = await Sequence.findOneAndUpdate(
+                { id: 'money_receipt_no' },
+                { $inc: { sequence_value: 1 } },
+                { new: true, upsert: true, setDefaultsOnInsert: true }
+            );
+
+            const fy = getFinancialYear();
+            const receiptNo = `MR\\${fy}\\${sequence.sequence_value}`;
+
+            receipt = await MoneyReceipt.create({
+                appointment: appointmentId,
+                patient: appointment.patient._id,
+                receiptNo,
+                name,
+                age,
+                sex,
+                receivedFrom,
+                sumOfRupees,
+                purpose,
+                amount
+            });
+        }
+
+        res.json({ success: true, data: receipt });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+exports.getMoneyReceiptByAppointment = async (req, res) => {
+    try {
+        const receipt = await MoneyReceipt.findOne({ appointment: req.params.appointmentId });
+        if (!receipt) return res.status(404).json({ success: false, message: 'Receipt not found' });
+        res.json({ success: true, data: receipt });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
