@@ -55,7 +55,7 @@ const createAdmin = async () => {
             });
         }
 
-        console.log('Admin user ready: admin@eyenova.com / admin123');
+        console.log('Admin user ready: admin@eyenova.com / password123');
         console.log('Doctor user ready: doctor@eyenova.com / doctor123');
         process.exit();
     } catch (error) {

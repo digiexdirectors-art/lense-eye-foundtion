@@ -270,13 +270,13 @@ const GlassPrescriptionGenerator = () => {
 
                   <div style={{ flex: 1.2, textAlign: 'right', color: '#1e293b', fontSize: '0.75rem', lineHeight: '1.2' }}>
                     <p style={{ margin: 0, fontWeight: 700, color: 'var(--primary-color)' }}>For Appointment:</p>
-                    <p style={{ margin: '0 0 2px 0', fontWeight: 700, color: 'var(--primary-color)' }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+                    <p style={{ margin: '0 0 2px 0', fontWeight: 700 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
                     {settings.address && settings.address.split('\n').map((line: string, i: number) => (
                       <p key={i} style={{ margin: 0, fontWeight: 700 }}>{line.toUpperCase()}</p>
                     ))}
                     <p style={{ margin: '2px 0 0 0' }}><b>Tel:</b> {settings.phone}</p>
                     <p style={{ margin: 0 }}><b>Email:</b> {settings.email}</p>
-                    <p style={{ margin: '2px 0 0 0', fontWeight: 800, color: 'var(--primary-color)', fontSize: '0.9rem' }}>GSTIN: {settings.gstin}</p>
+                    {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
                   </div>
                 </div>
               </td>

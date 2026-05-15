@@ -21,6 +21,24 @@ const MoneyReceipt = () => {
     purpose: '',
     amount: 0
   });
+
+  const numberToWords = (num: number) => {
+    const a = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ', 'ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ', 'eighteen ', 'nineteen '];
+    const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    
+    if (num === 0) return '';
+    const numStr = num.toString();
+    if (numStr.length > 9) return 'overflow';
+    const n = ('000000000' + numStr).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    if (!n) return ''; 
+    let str = '';
+    str += (Number(n[1]) !== 0) ? (a[Number(n[1])] || b[Number(n[1][0])] + ' ' + a[Number(n[1][1])]) + 'crore ' : '';
+    str += (Number(n[2]) !== 0) ? (a[Number(n[2])] || b[Number(n[2][0])] + ' ' + a[Number(n[2][1])]) + 'lakh ' : '';
+    str += (Number(n[3]) !== 0) ? (a[Number(n[3])] || b[Number(n[3][0])] + ' ' + a[Number(n[3][1])]) + 'thousand ' : '';
+    str += (Number(n[4]) !== 0) ? (a[Number(n[4])] || b[Number(n[4][0])] + ' ' + a[Number(n[4][1])]) + 'hundred ' : '';
+    str += (Number(n[5]) !== 0) ? ((str !== '') ? 'and ' : '') + (a[Number(n[5])] || b[Number(n[5][0])] + ' ' + a[Number(n[5][1])]) + 'only ' : '';
+    return str.toUpperCase();
+  };
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -106,18 +124,18 @@ const MoneyReceipt = () => {
 
       <div className="prescription-paper" ref={printRef} style={{ background: '#fff', padding: '40px', minHeight: '700px', position: 'relative', border: '1px solid #e2e8f0', boxShadow: '0 5px 25px rgba(0,0,0,0.1)' }}>
         {/* Header */}
-        <div style={{ borderBottom: '3px solid var(--primary-color)', paddingBottom: '10px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ borderBottom: '3px solid var(--primary-color)', paddingBottom: '1rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
             {settings.logoUrl && <img src={settings.logoUrl} alt="Logo" style={{ height: '100px', maxWidth: '250px', objectFit: 'contain' }} />}
             <div>
-              <h1 style={{ margin: 0, color: 'var(--primary-color)', fontSize: '2rem', fontWeight: 800, letterSpacing: '0.5px' }}>{settings.clinicName || 'THE LENS EYE FOUNDATION'}</h1>
+              <h1 style={{ margin: 0, color: 'var(--primary-color)', fontSize: '1.6rem', fontWeight: 800, letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>{settings.clinicName || 'THE LENS EYE FOUNDATION'}</h1>
               <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '1rem', fontWeight: 700, letterSpacing: '1px' }}>PREMIUM EYE CARE & OPTICALS</p>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: '0.8rem', color: 'var(--primary-color)' }}>For Appointment:</p>
+            <p className="blue-text" style={{ margin: 0, fontWeight: 700, fontSize: '0.8rem', color: 'var(--primary-color)' }}>For Appointment:</p>
             <p style={{ margin: '1px 0 4px 0', fontSize: '0.8rem', fontWeight: 600 }}>{settings.appointmentHours || 'Mon-Sat: 9:00 AM - 6:00 PM'}</p>
             <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569', maxWidth: '250px', lineHeight: 1.3 }}>{settings.address || 'Address not set'}</p>
             <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', fontWeight: 600 }}>Tel: {settings.phone || '-'}</p>
@@ -202,7 +220,14 @@ const MoneyReceipt = () => {
               type="number"
               className="receipt-input"
               value={formData.amount === 0 ? '' : formData.amount}
-              onChange={(e) => setFormData({...formData, amount: Number(e.target.value)})}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setFormData({
+                  ...formData, 
+                  amount: val,
+                  sumOfRupees: numberToWords(val)
+                });
+              }}
               style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1.4rem', fontWeight: 800, background: 'transparent', color: '#000' }}
             />
           </div>
@@ -217,7 +242,8 @@ const MoneyReceipt = () => {
       <style>{`
         @media print {
           @page { size: auto; margin: 0 !important; }
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color: #000 !important; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          .blue-text { color: var(--primary-color) !important; }
           .print-hidden { display: none !important; }
           body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
           .prescription-container { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }

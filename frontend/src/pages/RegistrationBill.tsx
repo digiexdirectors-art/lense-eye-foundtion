@@ -101,7 +101,7 @@ const RegistrationBill = () => {
 
       <div className="prescription-paper" ref={printRef} style={{ background: '#fff', padding: '40px', minHeight: '800px', position: 'relative', border: '1px solid #e2e8f0', boxShadow: '0 5px 25px rgba(0,0,0,0.1)' }}>
         {/* Header */}
-        <div style={{ borderBottom: '3px solid var(--primary-color)', paddingBottom: '10px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ borderBottom: '3px solid var(--primary-color)', paddingBottom: '1rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             {settings.logoUrl && <img src={settings.logoUrl} alt="Logo" style={{ height: '60px', maxWidth: '160px', objectFit: 'contain' }} />}
             <div>

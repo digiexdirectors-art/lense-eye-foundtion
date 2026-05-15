@@ -262,11 +262,11 @@ const PrescriptionGenerator = () => {
         @media print {
           @page { 
             size: portrait; 
-            margin: 3mm !important; 
+            margin: 0 !important; 
           }
           .print-hidden { display: none !important; }
-          html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; font-size: 9pt; height: 100%; overflow: visible; }
-          .glass-card { box-shadow: none !important; border: none !important; padding: 3mm !important; width: 100% !important; margin: 0 !important; min-height: auto !important; }
+          html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; font-size: 9pt !important; height: 100%; overflow: visible; }
+          .glass-card { box-shadow: none !important; border: none !important; padding: 15mm !important; width: 100% !important; margin: 0 !important; min-height: auto !important; }
           .form-input, textarea, input { 
             border: 1px solid #f1f5f9 !important; 
             background: transparent !important; 
@@ -278,22 +278,29 @@ const PrescriptionGenerator = () => {
             line-height: 1.2 !important; 
             color: #1e293b !important;
           }
-          label, b, strong, th { font-weight: 800 !important; color: #000 !important; font-size: 9pt !important; }
-          h1 { font-size: 1.25rem !important; margin: 0 !important; font-weight: 800 !important; }
-          h3 { font-size: 1rem !important; margin-top: 0.25rem !important; margin-bottom: 0.15rem !important; padding-bottom: 2px !important; border-bottom: 1.5px solid var(--primary-color) !important; color: #000 !important; }
-          .spectacle-section-print { display: ${isPrintingSpectacle ? 'block' : 'none'} !important; }
-          table { border-collapse: collapse !important; width: 100% !important; margin-bottom: 0.2rem !important; }
-          table, th, td { border: 1px solid #f1f5f9 !important; padding: 2px 4px !important; font-size: 8.5pt !important; background: transparent !important; }
-          table thead th { background: #f8fafc !important; color: #000 !important; }
-          .info-grid { grid-template-columns: 1fr 1fr 1fr !important; gap: 0.3rem !important; margin-bottom: 0.4rem !important; border-bottom: 1px solid #f1f5f9 !important; padding-bottom: 4px !important; }
-          .info-grid p { margin: 0 !important; line-height: 1.3 !important; }
-          .info-grid b { min-width: 60px; display: inline-block; }
-          .complaints-grid { grid-template-columns: 1fr 1fr 1fr !important; gap: 0.4rem !important; margin-bottom: 0.4rem !important; }
+          label, b, strong, th { font-weight: 800 !important; color: #1e293b !important; font-size: 9pt !important; }
+          h1 { font-size: 1.4rem !important; margin: 0 !important; font-weight: 800 !important; color: var(--primary-color) !important; }
+          h3 { font-size: 0.95rem !important; margin-top: 0.75rem !important; margin-bottom: 0.25rem !important; padding-bottom: 1px !important; border-bottom: none !important; color: var(--primary-color) !important; text-transform: uppercase !important; }
+          .clinic-details p { line-height: 1.2 !important; margin: 0 !important; }
+          .clinic-details b, .clinic-details strong { color: #1e293b !important; }
+          .spectacle-section-print { display: ${isPrintingSpectacle ? 'block' : 'none'} !important; margin-bottom: 0.8rem !important; }
+          .page-break-avoid { margin-bottom: 0.8rem !important; }
+          table { border-collapse: collapse !important; width: 100% !important; margin-bottom: 0.15rem !important; border: none !important; }
+          table, th, td { border: none !important; padding: 2px 4px !important; font-size: 8.5pt !important; background: transparent !important; }
+          table thead th { background: #f8fafc !important; color: #000 !important; border: none !important; }
+          .info-grid { grid-template-columns: 1fr 1fr 1fr !important; gap: 0.2rem !important; margin-bottom: 0.3rem !important; border-bottom: none !important; padding-bottom: 2px !important; }
+          .info-grid p { margin: 0 !important; line-height: 1.2 !important; color: #1e293b !important; }
+          .info-grid b { min-width: 50px; display: inline-block; }
+          .info-grid span.label { color: #64748b !important; font-weight: 600 !important; }
+          .info-grid span.value-blue { color: var(--primary-color) !important; font-weight: 700 !important; }
+          .complaints-grid { grid-template-columns: 1fr 1fr 1fr !important; gap: 0.3rem !important; margin-bottom: 0.3rem !important; }
           .medication-row { margin-top: 1px !important; gap: 2px !important; }
-          .medication-row input { border-bottom: 1px solid #f1f5f9 !important; }
-          .signature-area { margin-top: 1.5rem !important; display: flex !important; justify-content: space-between !important; }
+          .medication-row input { border-bottom: none !important; }
           .page-break-avoid { page-break-inside: avoid !important; break-inside: avoid !important; }
+          .print-only { display: block !important; }
+          .print-hidden { display: none !important; }
         }
+        .print-only { display: none; }
       `}</style>
 
       <div
@@ -373,13 +380,14 @@ const PrescriptionGenerator = () => {
       >
         {/* Header */}
         <div
+          className="prescription-header"
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            borderBottom:
-              '2px solid var(--primary-color)',
+            borderBottom: '3px solid var(--primary-color)',
             paddingBottom: '1rem',
-            marginBottom: '1rem'
+            marginBottom: '1.25rem',
+            alignItems: 'center'
           }}
         >
           <div
@@ -394,78 +402,64 @@ const PrescriptionGenerator = () => {
                 src={settings.logoUrl}
                 alt="logo"
                 style={{
-                  maxHeight: '70px'
+                  maxHeight: '65px',
+                  maxWidth: '150px',
+                  objectFit: 'contain'
                 }}
               />
             ) : (
-              <Eye size={40} />
+              <Eye size={40} color="var(--primary-color)" />
             )}
 
             <div>
-              <h1>{settings.clinicName}</h1>
-              <p>Clinical Prescription</p>
+              <h1 style={{ color: 'var(--primary-color)', margin: 0, fontSize: '1.6rem', fontWeight: 800, textTransform: 'uppercase' }}>
+                {settings.clinicName}
+              </h1>
+              <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                CLINICAL PRESCRIPTION
+              </p>
             </div>
           </div>
 
-          <div style={{ textAlign: 'right' }}>
-            <p>{settings.phone}</p>
-            <p>{settings.email}</p>
-            <p>{settings.address}</p>
+          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.75rem', color: '#1e293b', lineHeight: '1.2' }}>
+            <p style={{ margin: 0, fontWeight: 700, color: 'var(--primary-color)' }}>For Appointment:</p>
+            <p style={{ margin: '0 0 2px 0', fontWeight: 700 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+            {settings.address && settings.address.split('\n').map((line: string, i: number) => (
+              <p key={i} style={{ margin: 0, fontWeight: 700, textTransform: 'uppercase', color: '#1e293b' }}>{line}</p>
+            ))}
+            <p style={{ margin: '2px 0 0 0' }}><b>Tel:</b> {settings.phone}</p>
+            <p style={{ margin: 0 }}><b>Email:</b> {settings.email}</p>
+            {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
           </div>
         </div>
 
-        {/* Patient Info */}
         <div
           className="info-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns:
-              '1fr 1fr 1fr',
-            gap: '1rem',
-            marginBottom: '1rem'
+            gridTemplateColumns: '1.2fr 1fr 1fr',
+            gap: '0.75rem',
+            marginBottom: '0.75rem',
+            borderBottom: '1px solid #f1f5f9',
+            paddingBottom: '0.5rem',
+            fontSize: '0.8rem'
           }}
         >
-          <div>
-            <p>
-              <b>Name:</b> {patient?.name}
-            </p>
-
-            <p>
-              <b>Age:</b> {patient?.age}
-            </p>
-
-            <p>
-              <b>Gender:</b> {patient?.gender}
-            </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <p><span className="label">Name:</span> <b style={{ fontSize: '1rem', color: '#111827' }}>{patient?.name}</b></p>
+            <p><span className="label">Age/Sex:</span> <b>{patient?.age} / {patient?.gender}</b></p>
+            <p><span className="label">MRD No:</span> <b className="value-blue" style={{ color: 'var(--primary-color)' }}>{patient?.mrdNumber}</b></p>
           </div>
 
-          <div>
-            <p>
-              <b>Phone:</b> {patient?.phone}
-            </p>
-
-            <p>
-              <b>MRD:</b> {patient?.mrdNumber}
-            </p>
-
-            <p>
-              <b>Purpose:</b> {patient?.purpose}
-            </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <p><span className="label">Mobile:</span> <b>{patient?.phone}</b></p>
+            <p><span className="label">Doctor:</span> <b>{docName}</b></p>
+            <p><span className="label">Date:</span> <b>{formData.prescriptionDate}</b></p>
           </div>
 
-          <div>
-            <p>
-              <b>Doctor:</b> {docName}
-            </p>
-
-            <p>
-              <b>Date:</b>{' '}
-              {formData.prescriptionDate}
-            </p>
-
-            <p>
-              <b>Address:</b> {patient?.address}
-            </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <p><span className="label">Purpose:</span> <b>{patient?.purpose}</b></p>
+            <p style={{ fontSize: '0.75rem', lineHeight: '1.2' }}><span className="label">Address:</span> <span>{patient?.address}</span></p>
           </div>
         </div>
 
@@ -826,7 +820,7 @@ const PrescriptionGenerator = () => {
         </div>
 
         {/* Comments */}
-        <div style={{ marginBottom: '1rem' }}>
+        <div className="print-hidden" style={{ marginBottom: '1rem' }}>
           <label>Comments</label>
 
           <textarea
@@ -843,7 +837,7 @@ const PrescriptionGenerator = () => {
         </div>
 
         {/* Notes */}
-        <div style={{ marginBottom: '1rem' }}>
+        <div className="print-hidden" style={{ marginBottom: '1rem' }}>
           <label>Additional Notes</label>
 
           <textarea
@@ -863,45 +857,52 @@ const PrescriptionGenerator = () => {
         <div
           className="page-break-avoid"
           style={{
-            display: 'grid',
-            gridTemplateColumns:
-              '1fr 1fr',
-            gap: '0.5rem',
             marginBottom: '1rem'
           }}
         >
-          <div>
-            <label>Next Review Date</label>
-
-            <input
-              type="date"
-              className="form-input"
-              value={formData.nextReviewDate}
-              onChange={e =>
-                setFormData({
-                  ...formData,
-                  nextReviewDate:
-                    e.target.value
-                })
-              }
-            />
+          {/* UI View */}
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }} className="review-flex-row print-hidden">
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>Next Review Date</label>
+              <input
+                type="date"
+                className="form-input"
+                value={formData.nextReviewDate}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    nextReviewDate: e.target.value
+                  })
+                }
+              />
+            </div>
+            <div style={{ flex: 2 }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>Next Review Note / Comment</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Review details..."
+                value={formData.nextReviewNote}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    nextReviewNote: e.target.value
+                  })
+                }
+              />
+            </div>
           </div>
 
-          <div>
-            <label>Next Review Note</label>
-
-            <input
-              type="text"
-              className="form-input"
-              value={formData.nextReviewNote}
-              onChange={e =>
-                setFormData({
-                  ...formData,
-                  nextReviewNote:
-                    e.target.value
-                })
-              }
-            />
+          {/* Print View */}
+          <div className="print-only">
+            {formData.nextReviewDate && (
+              <>
+                <h3 style={{ borderBottom: 'none', color: 'var(--primary-color)', marginBottom: '0.25rem' }}>Next Review</h3>
+                <p style={{ margin: 0, fontSize: '9pt' }}>
+                  <b>Date:</b> {formData.nextReviewDate} {formData.nextReviewNote && <span> - <b>Note:</b> {formData.nextReviewNote}</span>}
+                </p>
+              </>
+            )}
           </div>
         </div>
 
