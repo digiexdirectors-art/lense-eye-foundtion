@@ -90,7 +90,7 @@ const PrescriptionGenerator = () => {
             prescriptionDate:
               new Date().toISOString().split('T')[0]
           }));
-          
+
           // Check if existing prescription
           try {
             const { data: rxData } = await axios.get(`/api/prescriptions/appointment/${appointmentId}`, config);
@@ -260,15 +260,18 @@ const PrescriptionGenerator = () => {
     <>
       <style>{`
         @media print {
+          *, *:before, *:after { box-sizing: border-box !important; }
           @page { 
             size: portrait; 
             margin: 0 !important; 
           }
           .print-hidden { display: none !important; }
+          .section-divider { display: block !important; width: 100% !important; border: none !important; border-top: 2px solid #94a3b8 !important; margin: 0.5rem 0 0.8rem 0 !important; opacity: 1 !important; }
           html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; font-size: 9pt !important; height: 100%; overflow: visible; }
           .glass-card { box-shadow: none !important; border: none !important; padding: 15mm !important; width: 100% !important; margin: 0 !important; min-height: auto !important; }
           .form-input, textarea, input { 
-            border: 1px solid #f1f5f9 !important; 
+            border: none !important; 
+            outline: none !important; 
             background: transparent !important; 
             padding: 1px 4px !important; 
             font-size: 9pt !important; 
@@ -279,15 +282,22 @@ const PrescriptionGenerator = () => {
             color: #1e293b !important;
           }
           label, b, strong, th { font-weight: 800 !important; color: #1e293b !important; font-size: 9pt !important; }
-          h1 { font-size: 1.4rem !important; margin: 0 !important; font-weight: 800 !important; color: var(--primary-color) !important; }
-          h3 { font-size: 0.95rem !important; margin-top: 0.75rem !important; margin-bottom: 0.25rem !important; padding-bottom: 1px !important; border-bottom: none !important; color: var(--primary-color) !important; text-transform: uppercase !important; }
+          h1 { font-size: 2.2rem !important; margin: 0 !important; font-weight: 900 !important; color: var(--primary-color) !important; }
+          .prescription-logo { max-height: 150px !important; max-width: 380px !important; }
+          h3 { font-size: 0.95rem !important; margin-top: 0.3rem !important; margin-bottom: 0.15rem !important; padding-bottom: 1px !important; border-bottom: none !important; color: var(--primary-color) !important; text-transform: uppercase !important; }
           .clinic-details p { line-height: 1.2 !important; margin: 0 !important; }
           .clinic-details b, .clinic-details strong { color: #1e293b !important; }
-          .spectacle-section-print { display: ${isPrintingSpectacle ? 'block' : 'none'} !important; margin-bottom: 0.8rem !important; }
-          .page-break-avoid { margin-bottom: 0.8rem !important; }
+          .examination-finding-section { margin-top: 0.8rem !important; }
+          .diagnosis-container { margin-bottom: 0.6rem !important; }
+          .spectacle-section-print { display: ${isPrintingSpectacle ? 'block' : 'none'} !important; margin-bottom: 0.8rem !important; border: none !important; padding: 0 !important; overflow: visible !important; }
+          .spectacle-section-print div { overflow: visible !important; }
+          .spectacle-section-print h3 { border-bottom: none !important; margin: 0 0 0.5rem 0 !important; padding: 0 !important; }
+          .page-break-avoid { margin-bottom: 0.4rem !important; }
           table { border-collapse: collapse !important; width: 100% !important; margin-bottom: 0.15rem !important; border: none !important; }
           table, th, td { border: none !important; padding: 2px 4px !important; font-size: 8.5pt !important; background: transparent !important; }
-          table thead th { background: #f8fafc !important; color: #000 !important; border: none !important; }
+          table thead th { background: #f8fafc !important; color: #000 !important; border: none !important; border-bottom: none !important; }
+          .spectacle-section-print table { border-collapse: collapse !important; width: 100% !important; border: 1.5px solid #000 !important; }
+          .spectacle-section-print table th, .spectacle-section-print table td { border: 1.5px solid #000 !important; padding: 6px 8px !important; }
           .info-grid { grid-template-columns: 1fr 1fr 1fr !important; gap: 0.2rem !important; margin-bottom: 0.3rem !important; border-bottom: none !important; padding-bottom: 2px !important; }
           .info-grid p { margin: 0 !important; line-height: 1.2 !important; color: #1e293b !important; }
           .info-grid b { min-width: 50px; display: inline-block; }
@@ -347,7 +357,7 @@ const PrescriptionGenerator = () => {
           >
             <Printer size={16} /> Print (With Glass)
           </button>
-          
+
           <button
             className="btn-secondary small"
             onClick={() => handlePrint(false)}
@@ -399,11 +409,12 @@ const PrescriptionGenerator = () => {
           >
             {settings.logoUrl ? (
               <img
+                className="prescription-logo"
                 src={settings.logoUrl}
                 alt="logo"
                 style={{
-                  maxHeight: '65px',
-                  maxWidth: '150px',
+                  maxHeight: '150px',
+                  maxWidth: '380px',
                   objectFit: 'contain'
                 }}
               />
@@ -412,7 +423,7 @@ const PrescriptionGenerator = () => {
             )}
 
             <div>
-              <h1 style={{ color: 'var(--primary-color)', margin: 0, fontSize: '1.6rem', fontWeight: 800, textTransform: 'uppercase' }}>
+              <h1 style={{ color: 'var(--primary-color)', margin: 0, fontSize: '2.4rem', fontWeight: 900, textTransform: 'uppercase' }}>
                 {settings.clinicName}
               </h1>
               <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
@@ -421,14 +432,14 @@ const PrescriptionGenerator = () => {
             </div>
           </div>
 
-          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.75rem', color: '#1e293b', lineHeight: '1.2' }}>
-            <p style={{ margin: 0, fontWeight: 700, color: 'var(--primary-color)' }}>For Appointment:</p>
-            <p style={{ margin: '0 0 2px 0', fontWeight: 700 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.75rem', color: '#1e293b', lineHeight: '1.2', fontWeight: 'bold' }}>
+            <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-color)' }}>For Appointment:</p>
+            <p style={{ margin: '0 0 2px 0', fontWeight: 800 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
             {settings.address && settings.address.split('\n').map((line: string, i: number) => (
-              <p key={i} style={{ margin: 0, fontWeight: 700, textTransform: 'uppercase', color: '#1e293b' }}>{line}</p>
+              <p key={i} style={{ margin: 0, fontWeight: 800, textTransform: 'uppercase', color: '#1e293b' }}>{line}</p>
             ))}
-            <p style={{ margin: '2px 0 0 0' }}><b>Tel:</b> {settings.phone}</p>
-            <p style={{ margin: 0 }}><b>Email:</b> {settings.email}</p>
+            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Tel: {settings.phone}</p>
+            <p style={{ margin: 0, fontWeight: 800 }}>Email: {settings.email}</p>
             {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
           </div>
         </div>
@@ -462,6 +473,8 @@ const PrescriptionGenerator = () => {
             <p style={{ fontSize: '0.75rem', lineHeight: '1.2' }}><span className="label">Address:</span> <span>{patient?.address}</span></p>
           </div>
         </div>
+
+        <hr className="section-divider" style={{ border: 'none', borderTop: '2px solid #94a3b8', margin: '0.5rem 0 1rem 0' }} />
 
         {/* Complaints */}
         <div
@@ -530,23 +543,23 @@ const PrescriptionGenerator = () => {
         <div className="page-break-avoid" style={{ marginBottom: '1.5rem' }}>
           <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--primary-color)' }}>Refraction / Examination</h3>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className="refraction-table-print" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'left' }}>EYE</th>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>PGVN</th>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>BCVN</th>
-                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>NCT</th>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>PHVN</th>
+                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>NCT</th>
                 </tr>
               </thead>
               <tbody>
                 {['rightEye', 'leftEye'].map((eye) => (
                   <tr key={eye}>
                     <td style={{ padding: '0.5rem', border: '1px solid #e2e8f0', fontWeight: 'bold' }}>
-                      {eye === 'rightEye' ? 'Right (O.D.)' : 'Left (O.S.)'}
+                      {eye === 'rightEye' ? 'Right' : 'Left'}
                     </td>
-                    {['pgvn', 'bcvn', 'nct', 'phvn'].map((field) => (
+                    {['pgvn', 'bcvn', 'phvn', 'nct'].map((field) => (
                       <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>
                         <input
                           type="text"
@@ -571,7 +584,7 @@ const PrescriptionGenerator = () => {
         <div className="page-break-avoid" style={{ marginBottom: '1.5rem' }}>
           <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--primary-color)' }}>OPD Test</h3>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className="refraction-table-print" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'left' }}>EYE</th>
@@ -584,7 +597,7 @@ const PrescriptionGenerator = () => {
                 {['rightEye', 'leftEye'].map((eye) => (
                   <tr key={eye}>
                     <td style={{ padding: '0.5rem', border: '1px solid #e2e8f0', fontWeight: 'bold' }}>
-                      {eye === 'rightEye' ? 'Right (O.D.)' : 'Left (O.S.)'}
+                      {eye === 'rightEye' ? 'Right' : 'Left'}
                     </td>
                     {['acd', 'pupillaryReaction', 'eom'].map((field) => (
                       <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>
@@ -628,7 +641,7 @@ const PrescriptionGenerator = () => {
                 {['rightEye', 'leftEye'].map((eye) => (
                   <tr key={eye}>
                     <td style={{ padding: '0.5rem', border: '1px solid #e2e8f0', fontWeight: 'bold' }}>
-                      {eye === 'rightEye' ? 'Right (O.D.)' : 'Left (O.S.)'}
+                      {eye === 'rightEye' ? 'Right' : 'Left'}
                     </td>
                     {['sph', 'cyl', 'axis', 'va'].map((field) => (
                       <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>
@@ -655,10 +668,10 @@ const PrescriptionGenerator = () => {
         </div>
 
         {/* Examination Finding */}
-        <div className="page-break-avoid" style={{ marginBottom: '1.5rem' }}>
+        <div className="page-break-avoid examination-finding-section" style={{ marginBottom: '1.5rem' }}>
           <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--primary-color)' }}>Examination Finding</h3>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className="refraction-table-print" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'left' }}>EYE</th>
@@ -670,7 +683,7 @@ const PrescriptionGenerator = () => {
                 {['rightEye', 'leftEye'].map((eye) => (
                   <tr key={eye}>
                     <td style={{ padding: '0.5rem', border: '1px solid #e2e8f0', fontWeight: 'bold' }}>
-                      {eye === 'rightEye' ? 'Right (O.D.)' : 'Left (O.S.)'}
+                      {eye === 'rightEye' ? 'Right' : 'Left'}
                     </td>
                     {['anteriorSegment', 'posteriorSegment'].map((field) => (
                       <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>
@@ -697,11 +710,11 @@ const PrescriptionGenerator = () => {
         </div>
 
         {/* Diagnosis */}
-        <div style={{ marginBottom: '1rem' }}>
+        <div className="diagnosis-container" style={{ marginBottom: '1rem' }}>
           <label>Diagnosis</label>
 
           <textarea
-            className="form-input"
+            className="form-input print-hidden"
             rows={3}
             value={formData.diagnosis}
             onChange={e =>
@@ -711,6 +724,9 @@ const PrescriptionGenerator = () => {
               })
             }
           />
+          <div className="print-only" style={{ whiteSpace: 'pre-wrap', margin: 0, fontSize: '9pt', lineHeight: 1.2, minHeight: formData.diagnosis ? 'auto' : '1rem' }}>
+            {formData.diagnosis}
+          </div>
         </div>
 
         {/* Medications */}
@@ -876,21 +892,6 @@ const PrescriptionGenerator = () => {
                 }
               />
             </div>
-            <div style={{ flex: 2 }}>
-              <label style={{ display: 'block', marginBottom: '0.25rem' }}>Next Review Note / Comment</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Review details..."
-                value={formData.nextReviewNote}
-                onChange={e =>
-                  setFormData({
-                    ...formData,
-                    nextReviewNote: e.target.value
-                  })
-                }
-              />
-            </div>
           </div>
 
           {/* Print View */}
@@ -899,7 +900,7 @@ const PrescriptionGenerator = () => {
               <>
                 <h3 style={{ borderBottom: 'none', color: 'var(--primary-color)', marginBottom: '0.25rem' }}>Next Review</h3>
                 <p style={{ margin: 0, fontSize: '9pt' }}>
-                  <b>Date:</b> {formData.nextReviewDate} {formData.nextReviewNote && <span> - <b>Note:</b> {formData.nextReviewNote}</span>}
+                  <b>Date:</b> {formData.nextReviewDate}
                 </p>
               </>
             )}

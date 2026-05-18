@@ -190,6 +190,7 @@ const GlassPrescriptionGenerator = () => {
 
       <style>{`
         @media print {
+          *, *:before, *:after { box-sizing: border-box !important; }
           @page { 
             size: landscape; 
             margin: 0 !important; 
@@ -219,17 +220,24 @@ const GlassPrescriptionGenerator = () => {
           }
           thead { display: table-header-group; }
           tbody { display: table-row-group; }
-          .form-input { border: none !important; background: transparent !important; padding: 0 !important; font-size: 0.9rem !important; font-weight: 600 !important; }
+          .form-input { border: none !important; background: transparent !important; padding: 0 !important; font-size: 0.9rem !important; font-weight: normal !important; }
           .prescription-header { 
             margin: 0 0 0.5rem 0 !important; 
             padding: 0.5rem 0 !important; 
             border-bottom: 2px solid var(--primary-color) !important;
             height: auto !important;
           }
-          .prescription-header img { maxHeight: 50px !important; }
-          h1 { font-size: 1.2rem !important; }
+          .prescription-header img { max-height: 150px !important; max-width: 380px !important; }
+          h1 { font-size: 2.2rem !important; font-weight: 900 !important; margin: 0 !important; }
           h3 { margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; font-size: 0.9rem !important; }
-          .table-container { margin-bottom: 0.25rem !important; }
+          .spectacle-section-print { border: none !important; padding: 0 !important; margin-bottom: 1rem !important; overflow: visible !important; }
+          .spectacle-section-print div { overflow: visible !important; }
+          .spectacle-section-print h3 { border-bottom: none !important; margin: 0 0 0.5rem 0 !important; padding: 0 !important; }
+          .table-container { margin: 0 !important; }
+          .table-container table { border-collapse: collapse !important; width: 100% !important; border: 1.5px solid #000 !important; }
+          .table-container table th { border: 1.5px solid #000 !important; padding: 6px 8px !important; font-weight: bold !important; text-align: center !important; }
+          .table-container table td { border: 1.5px solid #000 !important; padding: 6px 8px !important; font-weight: normal !important; text-align: center !important; }
+          .table-container table td .form-input { font-weight: normal !important; text-align: center !important; }
           table { font-size: 0.85rem !important; }
           th, td { padding: 4px !important; }
           .signature-section { margin-top: 1rem !important; }
@@ -254,12 +262,12 @@ const GlassPrescriptionGenerator = () => {
                 }}>
                   <div style={{ flex: 2, display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     {settings.logoUrl ? (
-                      <img src={settings.logoUrl} alt="Logo" style={{ maxHeight: '80px', maxWidth: '160px', objectFit: 'contain' }} />
+                      <img src={settings.logoUrl} alt="Logo" style={{ maxHeight: '150px', maxWidth: '380px', objectFit: 'contain' }} className="prescription-logo" />
                     ) : (
                       <Eye size={40} color="var(--primary-color)" />
                     )}
                     <div>
-                      <h1 style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0, color: 'var(--primary-color)', textTransform: 'uppercase' }}>
+                      <h1 style={{ fontSize: '2.4rem', fontWeight: 900, margin: 0, color: 'var(--primary-color)', textTransform: 'uppercase' }}>
                         {settings.clinicName}
                       </h1>
                       <p style={{ margin: '0', fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
@@ -268,14 +276,14 @@ const GlassPrescriptionGenerator = () => {
                     </div>
                   </div>
 
-                  <div style={{ flex: 1.2, textAlign: 'right', color: '#1e293b', fontSize: '0.75rem', lineHeight: '1.2' }}>
-                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--primary-color)' }}>For Appointment:</p>
-                    <p style={{ margin: '0 0 2px 0', fontWeight: 700 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+                  <div style={{ flex: 1.2, textAlign: 'right', color: '#1e293b', fontSize: '0.75rem', lineHeight: '1.2', fontWeight: 'bold' }}>
+                    <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-color)' }}>For Appointment:</p>
+                    <p style={{ margin: '0 0 2px 0', fontWeight: 800 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
                     {settings.address && settings.address.split('\n').map((line: string, i: number) => (
-                      <p key={i} style={{ margin: 0, fontWeight: 700 }}>{line.toUpperCase()}</p>
+                      <p key={i} style={{ margin: 0, fontWeight: 800 }}>{line.toUpperCase()}</p>
                     ))}
-                    <p style={{ margin: '2px 0 0 0' }}><b>Tel:</b> {settings.phone}</p>
-                    <p style={{ margin: 0 }}><b>Email:</b> {settings.email}</p>
+                    <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Tel: {settings.phone}</p>
+                    <p style={{ margin: 0, fontWeight: 800 }}>Email: {settings.email}</p>
                     {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
                   </div>
                 </div>
@@ -315,24 +323,25 @@ const GlassPrescriptionGenerator = () => {
                 </div>
 
                 {/* Spectacle Prescription Table */}
-                <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem', color: '#1e293b', borderLeft: '3px solid #8b5cf6', paddingLeft: '0.5rem' }}>Spectacle Prescription</h3>
-                <div className="table-container" style={{ margin: '0 0 1rem 0', boxShadow: 'none' }}>
+                <div className="spectacle-section-print">
+                  <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem', color: '#1e293b', borderLeft: '3px solid #8b5cf6', paddingLeft: '0.5rem' }}>Spectacle Prescription</h3>
+                  <div className="table-container" style={{ margin: '0 0 1rem 0', boxShadow: 'none' }}>
                   <table style={{ width: '100%', border: '1px solid #e2e8f0' }}>
                     <thead>
                       <tr style={{ background: '#f8fafc' }}>
-                        <th style={{ padding: '0.75rem' }}>Eye</th>
-                        <th>Sph</th>
-                        <th>Cyl</th>
-                        <th>Axis</th>
-                        <th>V/A</th>
+                        <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>Eye</th>
+                        <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>Sph</th>
+                        <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>Cyl</th>
+                        <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>Axis</th>
+                        <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>V/A</th>
                       </tr>
                     </thead>
                     <tbody>
                       {['rightEye', 'leftEye'].map((eye) => (
                         <tr key={eye}>
-                          <td style={{ fontWeight: 700, padding: '0.75rem', background: '#f8fafc' }}>{eye === 'rightEye' ? 'RE (O.D.)' : 'LE (O.S.)'}</td>
+                          <td style={{ fontWeight: 700, padding: '0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0' }}>{eye === 'rightEye' ? 'Right' : 'Left'}</td>
                           {['sph', 'cyl', 'axis', 'va'].map(field => (
-                            <td key={field} style={{ padding: '0.5rem' }}>
+                            <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>
                               <input 
                                 type="text" 
                                 className="form-input" 
@@ -353,6 +362,7 @@ const GlassPrescriptionGenerator = () => {
                       ))}
                     </tbody>
                   </table>
+                  </div>
                 </div>
 
                 {/* Glass Customization Fields */}
