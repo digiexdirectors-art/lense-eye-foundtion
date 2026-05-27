@@ -285,7 +285,8 @@ const PrescriptionGenerator = () => {
           h1 { font-size: 2.2rem !important; margin: 0 !important; font-weight: 900 !important; color: var(--primary-color) !important; }
           .prescription-logo { max-height: 150px !important; max-width: 380px !important; }
           h3 { font-size: 0.95rem !important; margin-top: 0.3rem !important; margin-bottom: 0.15rem !important; padding-bottom: 1px !important; border-bottom: none !important; color: var(--primary-color) !important; text-transform: uppercase !important; }
-          .clinic-details p { line-height: 1.2 !important; margin: 0 !important; }
+          .clinic-details p { line-height: 1.2 !important; margin: 0 !important; font-size: 10.5pt !important; }
+          .clinic-details p.clinic-address-line { font-size: 11.5pt !important; }
           .clinic-details b, .clinic-details strong { color: #1e293b !important; }
           .examination-finding-section { margin-top: 0.8rem !important; }
           .diagnosis-container { margin-bottom: 0.6rem !important; }
@@ -429,18 +430,22 @@ const PrescriptionGenerator = () => {
               <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 CLINICAL PRESCRIPTION
               </p>
+              <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '2px' }}>
+                EYE CARE HOSPITAL
+              </p>
             </div>
           </div>
 
-          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.75rem', color: '#1e293b', lineHeight: '1.2', fontWeight: 'bold' }}>
+          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.92rem', color: '#1e293b', lineHeight: '1.2', fontWeight: 'bold' }}>
             <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-color)' }}>For Appointment:</p>
             <p style={{ margin: '0 0 2px 0', fontWeight: 800 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
             {settings.address && settings.address.split('\n').map((line: string, i: number) => (
-              <p key={i} style={{ margin: 0, fontWeight: 800, textTransform: 'uppercase', color: '#1e293b' }}>{line}</p>
+              <p key={i} className="clinic-address-line" style={{ margin: 0, fontWeight: 800, textTransform: 'uppercase', color: '#1e293b', fontSize: '0.95rem' }}>{line}</p>
             ))}
             <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Tel: {settings.phone}</p>
             <p style={{ margin: 0, fontWeight: 800 }}>Email: {settings.email}</p>
             {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
+            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Mob: {settings.mobile || '+91 9733035399'}</p>
           </div>
         </div>
 
@@ -539,11 +544,18 @@ const PrescriptionGenerator = () => {
           </div>
         </div>
 
-        {/* Refraction / Examination */}
+        {/* Examination */}
         <div className="page-break-avoid" style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--primary-color)' }}>Refraction / Examination</h3>
+          <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--primary-color)' }}>Examination</h3>
           <div style={{ overflowX: 'auto' }}>
             <table className="refraction-table-print" style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <colgroup>
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '25%' }} />
+              </colgroup>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'left' }}>EYE</th>
@@ -585,6 +597,12 @@ const PrescriptionGenerator = () => {
           <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--primary-color)' }}>OPD Test</h3>
           <div style={{ overflowX: 'auto' }}>
             <table className="refraction-table-print" style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <colgroup>
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '40%' }} />
+                <col style={{ width: '25%' }} />
+              </colgroup>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'left' }}>EYE</th>
@@ -628,13 +646,20 @@ const PrescriptionGenerator = () => {
           <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--primary-color)' }}>Spectacle Prescription</h3>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <colgroup>
+                <col style={{ width: '15%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '20%' }} />
+                <col style={{ width: '25%' }} />
+              </colgroup>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'left' }}>EYE</th>
-                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>SPH</th>
-                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>CYL</th>
-                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>AXIS</th>
-                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>V/A</th>
+                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>SPH</th>
+                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>CYL</th>
+                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>AXIS</th>
+                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>V/A</th>
                 </tr>
               </thead>
               <tbody>
@@ -644,11 +669,11 @@ const PrescriptionGenerator = () => {
                       {eye === 'rightEye' ? 'Right' : 'Left'}
                     </td>
                     {['sph', 'cyl', 'axis', 'va'].map((field) => (
-                      <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>
+                      <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                         <input
                           type="text"
                           className="form-input"
-                          style={{ border: 'none', padding: '0.25rem', width: '100%' }}
+                          style={{ border: 'none', padding: '0.25rem', width: '100%', textAlign: 'center' }}
                           value={(formData.spectaclePrescription as any)[eye][field]}
                           onChange={(e) => setFormData({
                             ...formData,

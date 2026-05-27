@@ -10,7 +10,7 @@ exports.getSettings = async (req, res) => {
         
         if (!settings) {
             // If no settings in DB, return values from .env (via branding helper)
-            return res.json(getBranding());
+            return res.json(await getBranding());
         }
         
         res.json(settings);
@@ -25,7 +25,7 @@ exports.getSettings = async (req, res) => {
 exports.updateSettings = async (req, res) => {
     try {
         const { 
-            clinicName, tagline, phone, email, address, gstin, logoUrl,
+            clinicName, tagline, phone, email, address, gstin, mobile, logoUrl,
             smtpHost, smtpPort, smtpUser, smtpPass, smsApiKey, appointmentHours
         } = req.body;
         
@@ -39,6 +39,7 @@ exports.updateSettings = async (req, res) => {
             settings.email = email;
             settings.address = address;
             settings.gstin = gstin;
+            settings.mobile = mobile;
             settings.logoUrl = logoUrl;
             // SMTP & SMS fields
             if (smtpHost !== undefined) settings.smtpHost = smtpHost;
@@ -51,7 +52,7 @@ exports.updateSettings = async (req, res) => {
         } else {
             // Create new
             settings = await Setting.create({
-                clinicName, tagline, phone, email, address, gstin, logoUrl,
+                clinicName, tagline, phone, email, address, gstin, mobile, logoUrl,
                 smtpHost, smtpPort, smtpUser, smtpPass, smsApiKey, appointmentHours
             });
         }

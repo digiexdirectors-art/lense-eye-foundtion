@@ -17,6 +17,7 @@ const getBranding = async () => {
                 phone: dbSettings.phone || "",
                 email: dbSettings.email || "",
                 gstin: dbSettings.gstin || "",
+                mobile: dbSettings.mobile || "+91 9733035399",
                 logoUrl: dbSettings.logoUrl || "",
                 appointmentHours: dbSettings.appointmentHours || "Mon-Sat: 9:00AM - 6:00 PM"
             };
@@ -33,6 +34,7 @@ const getBranding = async () => {
         phone: clean(process.env.CLINIC_PHONE) || "",
         email: clean(process.env.CLINIC_EMAIL) || "",
         gstin: clean(process.env.CLINIC_GSTIN) || "",
+        mobile: clean(process.env.CLINIC_MOBILE) || "+91 9733035399",
         logoUrl: clean(process.env.CLINIC_LOGO_URL) || "",
         appointmentHours: clean(process.env.CLINIC_APPOINTMENT_HOURS) || "Mon-Sat: 9:00AM - 6:00 PM"
     };

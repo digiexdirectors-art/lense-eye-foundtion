@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
-import { Printer, ArrowLeft, CreditCard } from 'lucide-react';
+import { Printer, ArrowLeft, CreditCard, Eye } from 'lucide-react';
 
 const RegistrationBill = () => {
   const { id } = useParams();
@@ -101,19 +101,62 @@ const RegistrationBill = () => {
 
       <div className="prescription-paper" ref={printRef} style={{ background: '#fff', padding: '40px', minHeight: '800px', position: 'relative', border: '1px solid #e2e8f0', boxShadow: '0 5px 25px rgba(0,0,0,0.1)' }}>
         {/* Header */}
-        <div style={{ borderBottom: '3px solid var(--primary-color)', paddingBottom: '1rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {settings.logoUrl && <img src={settings.logoUrl} alt="Logo" style={{ height: '60px', maxWidth: '160px', objectFit: 'contain' }} />}
+        <div
+          className="prescription-header"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '3px solid var(--primary-color)',
+            paddingBottom: '1rem',
+            marginBottom: '1.25rem',
+            alignItems: 'center'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center'
+            }}
+          >
+            {settings.logoUrl ? (
+              <img
+                className="prescription-logo"
+                src={settings.logoUrl}
+                alt="logo"
+                style={{
+                  maxHeight: '150px',
+                  maxWidth: '380px',
+                  objectFit: 'contain'
+                }}
+              />
+            ) : (
+              <Eye size={40} color="var(--primary-color)" />
+            )}
+
             <div>
-              <h1 style={{ margin: 0, color: 'var(--primary-color)', fontSize: '1.6rem', fontWeight: 800 }}>{settings.clinicName || 'THE LENS EYE FOUNDATION'}</h1>
-              <p style={{ margin: '2px 0 0 0', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>PREMIUM EYE CARE & OPTICALS</p>
+              <h1 style={{ color: 'var(--primary-color)', margin: 0, fontSize: '2.4rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                {settings.clinicName}
+              </h1>
+              <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                BILL OF SUPPLY
+              </p>
+              <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '2px' }}>
+                EYE CARE HOSPITAL
+              </p>
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: '0.8rem', color: 'var(--primary-color)' }}>For Appointment:</p>
-            <p style={{ margin: '1px 0 4px 0', fontSize: '0.8rem', fontWeight: 600 }}>{settings.appointmentHours || 'Mon-Sat: 9:00 AM - 6:00 PM'}</p>
-            <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569', maxWidth: '250px', lineHeight: 1.3 }}>{settings.address || 'Address not set'}</p>
-            <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', fontWeight: 600 }}>Tel: {settings.phone || '-'}</p>
+
+          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.92rem', color: '#1e293b', lineHeight: '1.2', fontWeight: 'bold' }}>
+            <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-color)' }}>For Appointment:</p>
+            <p style={{ margin: '0 0 2px 0', fontWeight: 800 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+            {settings.address && settings.address.split('\n').map((line: string, i: number) => (
+              <p key={i} className="clinic-address-line" style={{ margin: 0, fontWeight: 800, textTransform: 'uppercase', color: '#1e293b', fontSize: '0.95rem' }}>{line}</p>
+            ))}
+            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Tel: {settings.phone}</p>
+            <p style={{ margin: 0, fontWeight: 800 }}>Email: {settings.email}</p>
+            {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
+            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Mob: {settings.mobile || '+91 9733035399'}</p>
           </div>
         </div>
 
@@ -208,7 +251,7 @@ const RegistrationBill = () => {
           </div>
           <div style={{ marginTop: '15px', textAlign: 'left', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
             <p style={{ margin: 0, fontSize: '0.7rem', color: '#1e293b', fontWeight: 700 }}>
-              PLEASE NOTE: Consultation/registration with the same doctor is valid for 30 days from the date of payment.
+              PLEASE NOTE: Consultation/registration with the same doctor is valid for 15 days from the date of payment.
             </p>
             <p style={{ margin: '5px 0 0 0', fontSize: '0.65rem', color: '#475569', lineHeight: '1.4' }}>
               <span style={{ fontWeight: 700, color: '#1e293b' }}>IMPORTANT MESSAGE FOR PATIENT & ATTENDANTS:</span> Only one attendant is allowed with one patient in the hospital premises. 
@@ -244,15 +287,26 @@ const RegistrationBill = () => {
           .prescription-paper { 
             box-shadow: none !important; 
             border: none !important; 
-            padding: 15mm !important; 
+            padding: 10mm !important; 
             margin: 0 !important;
-            page-break-inside: auto !important;
-            break-inside: auto !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
             min-height: auto !important;
             height: auto !important;
             width: 100% !important;
           }
           input { border: none !important; }
+          h1 { font-size: 2.2rem !important; margin: 0 !important; font-weight: 900 !important; color: var(--primary-color) !important; }
+          .prescription-logo { max-height: 150px !important; max-width: 380px !important; }
+          .clinic-details p { line-height: 1.2 !important; margin: 0 !important; font-size: 10.5pt !important; }
+          .clinic-details p.clinic-address-line { font-size: 11.5pt !important; }
+          .clinic-details b, .clinic-details strong { color: #1e293b !important; }
+          .prescription-header {
+            margin: 0 0 0.5rem 0 !important;
+            padding: 0.5rem 0 !important;
+            border-bottom: 2px solid var(--primary-color) !important;
+            height: auto !important;
+          }
         }
         .print-only { display: none; }
       `}</style>

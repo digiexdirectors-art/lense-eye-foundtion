@@ -145,6 +145,17 @@ const SettingsPage = () => {
           </div>
 
           <div className="form-group">
+            <label className="form-label"><Phone size={18} /> Additional Mobile (Mob)</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.mobile}
+              onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+              placeholder="+91 9733035399"
+            />
+          </div>
+
+          <div className="form-group">
             <label className="form-label">Appointment Hours</label>
             <input
               type="text"

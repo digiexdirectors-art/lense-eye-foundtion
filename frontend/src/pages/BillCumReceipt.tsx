@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
-import { Printer, ArrowLeft, CreditCard } from 'lucide-react';
+import { Printer, ArrowLeft, CreditCard, Eye } from 'lucide-react';
 
 const BillCumReceipt = () => {
   const { id } = useParams();
@@ -108,29 +108,72 @@ const BillCumReceipt = () => {
 
       <div className="prescription-paper" ref={printRef} style={{ display: 'flex', flexDirection: 'column', background: '#fff', padding: '40px', minHeight: '800px', position: 'relative', border: '1px solid #e2e8f0', boxShadow: '0 5px 25px rgba(0,0,0,0.1)' }}>
         {/* Header */}
-        <div style={{ borderBottom: '3px solid var(--primary-color)', paddingBottom: '10px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {settings.logoUrl && <img src={settings.logoUrl} alt="Logo" style={{ height: '60px', maxWidth: '160px', objectFit: 'contain' }} />}
+        <div
+          className="prescription-header"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '3px solid var(--primary-color)',
+            paddingBottom: '1rem',
+            marginBottom: '1.25rem',
+            alignItems: 'center'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center'
+            }}
+          >
+            {settings.logoUrl ? (
+              <img
+                className="prescription-logo"
+                src={settings.logoUrl}
+                alt="logo"
+                style={{
+                  maxHeight: '150px',
+                  maxWidth: '380px',
+                  objectFit: 'contain'
+                }}
+              />
+            ) : (
+              <Eye size={40} color="var(--primary-color)" />
+            )}
+
             <div>
-              <h1 style={{ margin: 0, color: 'var(--primary-color)', fontSize: '1.6rem', fontWeight: 800 }}>{settings.clinicName || 'THE LENS EYE FOUNDATION'}</h1>
-              <p style={{ margin: '2px 0 0 0', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>PREMIUM EYE CARE & OPTICALS</p>
+              <h1 style={{ color: 'var(--primary-color)', margin: 0, fontSize: '2.4rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                {settings.clinicName}
+              </h1>
+              <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                BILL CUM RECEIPT
+              </p>
+              <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '2px' }}>
+                EYE CARE HOSPITAL
+              </p>
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: '0.8rem', color: 'var(--primary-color)' }}>For Appointment:</p>
-            <p style={{ margin: '1px 0 4px 0', fontSize: '0.8rem', fontWeight: 600 }}>{settings.appointmentHours || 'Mon-Sat: 9:00 AM - 6:00 PM'}</p>
-            <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569', maxWidth: '250px', lineHeight: 1.3 }}>{settings.address || 'Address not set'}</p>
-            <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', fontWeight: 600 }}>Tel: {settings.phone || '-'}</p>
+
+          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.92rem', color: '#1e293b', lineHeight: '1.2', fontWeight: 'bold' }}>
+            <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-color)' }}>For Appointment:</p>
+            <p style={{ margin: '0 0 2px 0', fontWeight: 800 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+            {settings.address && settings.address.split('\n').map((line: string, i: number) => (
+              <p key={i} className="clinic-address-line" style={{ margin: 0, fontWeight: 800, textTransform: 'uppercase', color: '#1e293b', fontSize: '0.95rem' }}>{line}</p>
+            ))}
+            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Tel: {settings.phone}</p>
+            <p style={{ margin: 0, fontWeight: 800 }}>Email: {settings.email}</p>
+            {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
+            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Mob: {settings.mobile || '+91 9733035399'}</p>
           </div>
         </div>
 
         {/* Bill Title */}
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <div className="bill-title" style={{ textAlign: 'center', marginBottom: '20px' }}>
           <h2 style={{ display: 'inline-block', borderBottom: '2px solid #e2e8f0', paddingBottom: '3px', color: '#1e293b', fontSize: '1.2rem', fontWeight: 700, letterSpacing: '1px' }}>BILL CUM RECEIPT</h2>
         </div>
 
         {/* Info Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '25px' }}>
+        <div className="info-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '25px' }}>
           {/* Left Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex' }}>
@@ -175,7 +218,7 @@ const BillCumReceipt = () => {
         </div>
 
         {/* Table */}
-        <div style={{ marginBottom: '30px' }}>
+        <div className="table-wrapper" style={{ marginBottom: '30px' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: 'var(--primary-color)', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
@@ -199,7 +242,7 @@ const BillCumReceipt = () => {
         </div>
 
         {/* Summary */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
+        <div className="summary-wrapper" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
           <div style={{ width: '60%' }}>
             <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700, color: '#64748b' }}>Net Amount in (Words):</p>
             <p style={{ margin: '3px 0 0 0', fontSize: '0.85rem', fontWeight: 800, color: '#1e293b' }}>RUPEES {numberToWords(displayData.amount)}</p>
@@ -221,9 +264,9 @@ const BillCumReceipt = () => {
         </div>
 
         {/* Footer Section */}
-        <div style={{ marginTop: '20px', paddingBottom: '10px' }}>
+        <div className="footer-section" style={{ marginTop: '20px', paddingBottom: '10px' }}>
           {/* Note Section */}
-          <div style={{ marginBottom: '20px', textAlign: 'left', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+          <div className="note-section" style={{ marginBottom: '20px', textAlign: 'left', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#1e293b', fontWeight: 600, lineHeight: '1.5' }}>
               <span style={{ fontWeight: 800 }}>PLEASE NOTE:</span> Follow-up or repeat consultation is free for upto 15 (Fifteen) days from the last doctor consultation date. 
               Rs {displayData.amount.toFixed(2)} shall be charged subsequent OPD consultation after 15 days.
@@ -231,7 +274,7 @@ const BillCumReceipt = () => {
           </div>
 
           {/* Signature Grid */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '20px' }}>
+          <div className="signature-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '20px' }}>
             <div style={{ textAlign: 'center', width: '200px' }}>
               <div style={{ borderBottom: '1.5px solid #1e293b', marginBottom: '8px' }}></div>
               <p style={{ margin: 0, fontWeight: 700, color: '#1e293b', fontSize: '0.85rem' }}>Patient/Attendant Signature</p>
@@ -275,13 +318,46 @@ const BillCumReceipt = () => {
           .prescription-paper { 
             box-shadow: none !important; 
             border: none !important; 
-            padding: 15mm !important;
+            padding: 8mm !important;
             margin: 0 !important;
-            page-break-inside: auto !important;
-            break-inside: auto !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
             min-height: auto !important;
             height: auto !important;
             width: 100% !important;
+          }
+          h1 { font-size: 2.2rem !important; margin: 0 !important; font-weight: 900 !important; color: var(--primary-color) !important; }
+          .prescription-logo { max-height: 150px !important; max-width: 380px !important; }
+          .clinic-details p { line-height: 1.2 !important; margin: 0 !important; font-size: 10.5pt !important; }
+          .clinic-details p.clinic-address-line { font-size: 11.5pt !important; }
+          .clinic-details b, .clinic-details strong { color: #1e293b !important; }
+          .prescription-header {
+            margin: 0 0 0.5rem 0 !important;
+            padding: 0.5rem 0 !important;
+            border-bottom: 2px solid var(--primary-color) !important;
+            height: auto !important;
+          }
+          .bill-title {
+            margin-bottom: 10px !important;
+          }
+          .info-grid {
+            margin-bottom: 12px !important;
+            gap: 15px !important;
+          }
+          .table-wrapper {
+            margin-bottom: 12px !important;
+          }
+          .summary-wrapper {
+            margin-bottom: 12px !important;
+          }
+          .footer-section {
+            margin-top: 10px !important;
+          }
+          .note-section {
+            margin-bottom: 10px !important;
+          }
+          .signature-section {
+            margin-top: 10px !important;
           }
         }
       `}</style>

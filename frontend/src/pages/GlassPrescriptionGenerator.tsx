@@ -240,6 +240,8 @@ const GlassPrescriptionGenerator = () => {
           .table-container table td .form-input { font-weight: normal !important; text-align: center !important; }
           table { font-size: 0.85rem !important; }
           th, td { padding: 4px !important; }
+          .clinic-details p { font-size: 10.5pt !important; line-height: 1.2 !important; margin: 0 !important; }
+          .clinic-details p.clinic-address-line { font-size: 11.5pt !important; }
           .signature-section { margin-top: 1rem !important; }
           .important-message { margin-top: 0.5rem !important; padding-top: 0.25rem !important; }
           .important-message p { font-size: 0.65rem !important; line-height: 1.2 !important; }
@@ -273,18 +275,22 @@ const GlassPrescriptionGenerator = () => {
                       <p style={{ margin: '0', fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                         Glass Prescription
                       </p>
+                      <p style={{ margin: '0', fontSize: '1rem', fontWeight: 800, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '2px' }}>
+                        EYE CARE HOSPITAL
+                      </p>
                     </div>
                   </div>
 
-                  <div style={{ flex: 1.2, textAlign: 'right', color: '#1e293b', fontSize: '0.75rem', lineHeight: '1.2', fontWeight: 'bold' }}>
+                  <div className="clinic-details" style={{ flex: 1.2, textAlign: 'right', color: '#1e293b', fontSize: '0.92rem', lineHeight: '1.2', fontWeight: 'bold' }}>
                     <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-color)' }}>For Appointment:</p>
                     <p style={{ margin: '0 0 2px 0', fontWeight: 800 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
                     {settings.address && settings.address.split('\n').map((line: string, i: number) => (
-                      <p key={i} style={{ margin: 0, fontWeight: 800 }}>{line.toUpperCase()}</p>
+                      <p key={i} className="clinic-address-line" style={{ margin: 0, fontWeight: 800, fontSize: '0.95rem' }}>{line.toUpperCase()}</p>
                     ))}
                     <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Tel: {settings.phone}</p>
                     <p style={{ margin: 0, fontWeight: 800 }}>Email: {settings.email}</p>
                     {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
+                    <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Mob: {settings.mobile || '+91 9733035399'}</p>
                   </div>
                 </div>
               </td>

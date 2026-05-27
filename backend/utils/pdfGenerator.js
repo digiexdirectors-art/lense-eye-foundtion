@@ -59,32 +59,40 @@ const drawHeaderInternal = (doc, branding, logoBuffer, title, customDate, pageWi
        .fontSize(10)
        .text(title.toUpperCase(), textLeftOffset, headerTop + 40, { width: 250 });
 
+    if (title.toUpperCase() === "CLINICAL PRESCRIPTION") {
+        doc.fillColor(primaryColor)
+           .font("Helvetica-Bold")
+           .fontSize(11.5)
+           .text("EYE CARE HOSPITAL", textLeftOffset, headerTop + 54, { width: 250 });
+    }
+
     // 4. Contact Details on the RIGHT
     const rightMargin = pageWidth - 40;
     doc.fillColor(primaryColor)
        .font("Helvetica-Bold")
-       .fontSize(8)
+       .fontSize(9.5)
        .text("For Appointment:", 0, headerTop - 5, { align: "right", width: rightMargin })
-       .text(branding.appointmentHours || "Mon-Sat: 9:00AM - 6:00 PM", 0, headerTop + 4, { align: "right", width: rightMargin });
+       .text(branding.appointmentHours || "Mon-Sat: 9:00AM - 6:00 PM", 0, headerTop + 5, { align: "right", width: rightMargin });
 
-    let addrY = headerTop + 14;
-    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(8);
+    let addrY = headerTop + 16;
+    doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(10.5);
     if (branding.address) {
         branding.address.split('\n').forEach(line => {
             doc.text(line.toUpperCase(), 0, addrY, { align: "right", width: rightMargin });
-            addrY += 9;
+            addrY += 12;
         });
     }
     
     doc.font("Helvetica")
-       .fontSize(7.5)
+       .fontSize(9)
        .text(`Tel: ${branding.phone || '-'}`, 0, addrY + 2, { align: "right", width: rightMargin })
        .text(`Email: ${branding.email || '-'}`, 0, addrY + 11, { align: "right", width: rightMargin });
 
     doc.fillColor(primaryColor)
        .font("Helvetica-Bold")
-       .fontSize(9)
-       .text(`GSTIN: ${branding.gstin || '-'}`, 0, addrY + 24, { align: "right", width: rightMargin });
+       .fontSize(10)
+       .text(`GSTIN: ${branding.gstin || '-'}`, 0, addrY + 22, { align: "right", width: rightMargin })
+       .text(`Mob: ${branding.mobile || '+91 9733035399'}`, 0, addrY + 32, { align: "right", width: rightMargin });
 
     // Border line below header
     doc.strokeColor(primaryColor).lineWidth(3).moveTo(0, 100).lineTo(pageWidth, 100).stroke();
@@ -317,25 +325,25 @@ exports.generatePrescriptionPDF = async (res, prescription) => {
     }
 
     // Eye Table
-    doc.fillColor("#1e40af").font("Helvetica-Bold").fontSize(10).text("Refraction / Examination", 50, currentY);
+    doc.fillColor("#1e40af").font("Helvetica-Bold").fontSize(10).text("Examination", 50, currentY);
     currentY += 15;
     const tableTop = currentY;
     
     doc.fillColor("#f1f5f9").rect(50, tableTop - 5, 510, 20).fill();
     doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(9);
     doc.text("EYE", 55, tableTop);
-    doc.text("PGVN", 180, tableTop);
-    doc.text("BCVN", 300, tableTop);
-    doc.text("NCT", 380, tableTop);
-    doc.text("PHVN", 480, tableTop);
+    doc.text("PGVN", 150, tableTop);
+    doc.text("BCVN", 250, tableTop);
+    doc.text("PHVN", 350, tableTop);
+    doc.text("NCT", 450, tableTop);
 
     const drawRow = (label, data, y) => {
         doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(9).text(label, 55, y);
         doc.fillColor("#4b5563").font("Helvetica");
-        doc.text(data?.pgvn || "-", 180, y);
-        doc.text(data?.bcvn || "-", 300, y);
-        doc.text(data?.nct || "-", 380, y);
-        doc.text(data?.phvn || "-", 480, y);
+        doc.text(data?.pgvn || "-", 150, y);
+        doc.text(data?.bcvn || "-", 250, y);
+        doc.text(data?.phvn || "-", 350, y);
+        doc.text(data?.nct || "-", 450, y);
     };
 
     drawRow("Right (O.D.)", prescription.rightEye, tableTop + 25);

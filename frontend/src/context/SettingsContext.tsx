@@ -8,6 +8,7 @@ interface Settings {
   email: string;
   address: string;
   gstin: string;
+  mobile: string;
   logoUrl: string;
   appointmentHours: string;
   smtpHost: string;
@@ -33,6 +34,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     email: '',
     address: '',
     gstin: '',
+    mobile: '',
     logoUrl: '',
     appointmentHours: 'Mon-Sat: 9:00AM - 6:00 PM',
     smtpHost: '',

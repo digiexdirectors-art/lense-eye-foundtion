@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
-import { Printer, ArrowLeft } from 'lucide-react';
+import { Printer, ArrowLeft, Eye } from 'lucide-react';
 
 const MoneyReceipt = () => {
   const { id } = useParams();
@@ -124,31 +124,72 @@ const MoneyReceipt = () => {
 
       <div className="prescription-paper" ref={printRef} style={{ background: '#fff', padding: '40px', minHeight: '700px', position: 'relative', border: '1px solid #e2e8f0', boxShadow: '0 5px 25px rgba(0,0,0,0.1)' }}>
         {/* Header */}
-        <div style={{ borderBottom: '3px solid var(--primary-color)', paddingBottom: '1rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
-            {settings.logoUrl && <img src={settings.logoUrl} alt="Logo" style={{ height: '100px', maxWidth: '250px', objectFit: 'contain' }} />}
+        <div
+          className="prescription-header"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '3px solid var(--primary-color)',
+            paddingBottom: '1rem',
+            marginBottom: '1.25rem',
+            alignItems: 'center'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center'
+            }}
+          >
+            {settings.logoUrl ? (
+              <img
+                className="prescription-logo"
+                src={settings.logoUrl}
+                alt="logo"
+                style={{
+                  maxHeight: '150px',
+                  maxWidth: '380px',
+                  objectFit: 'contain'
+                }}
+              />
+            ) : (
+              <Eye size={40} color="var(--primary-color)" />
+            )}
+
             <div>
-              <h1 style={{ margin: 0, color: 'var(--primary-color)', fontSize: '1.6rem', fontWeight: 800, letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>{settings.clinicName || 'THE LENS EYE FOUNDATION'}</h1>
-              <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '1rem', fontWeight: 700, letterSpacing: '1px' }}>PREMIUM EYE CARE & OPTICALS</p>
+              <h1 style={{ color: 'var(--primary-color)', margin: 0, fontSize: '2.4rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                {settings.clinicName}
+              </h1>
+              <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                MONEY RECEIPT
+              </p>
+              <p style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '2px' }}>
+                EYE CARE HOSPITAL
+              </p>
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <p className="blue-text" style={{ margin: 0, fontWeight: 700, fontSize: '0.8rem', color: 'var(--primary-color)' }}>For Appointment:</p>
-            <p style={{ margin: '1px 0 4px 0', fontSize: '0.8rem', fontWeight: 600 }}>{settings.appointmentHours || 'Mon-Sat: 9:00 AM - 6:00 PM'}</p>
-            <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569', maxWidth: '250px', lineHeight: 1.3 }}>{settings.address || 'Address not set'}</p>
-            <p style={{ margin: '2px 0 0 0', fontSize: '0.75rem', fontWeight: 600 }}>Tel: {settings.phone || '-'}</p>
+
+          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.92rem', color: '#1e293b', lineHeight: '1.2', fontWeight: 'bold' }}>
+            <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-color)' }}>For Appointment:</p>
+            <p style={{ margin: '0 0 2px 0', fontWeight: 800 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+            {settings.address && settings.address.split('\n').map((line: string, i: number) => (
+              <p key={i} className="clinic-address-line" style={{ margin: 0, fontWeight: 800, textTransform: 'uppercase', color: '#1e293b', fontSize: '0.95rem' }}>{line}</p>
+            ))}
+            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Tel: {settings.phone}</p>
+            <p style={{ margin: 0, fontWeight: 800 }}>Email: {settings.email}</p>
+            {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
+            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Mob: {settings.mobile || '+91 9733035399'}</p>
           </div>
         </div>
 
         {/* Bill Title */}
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <div className="receipt-title" style={{ textAlign: 'center', marginBottom: '40px' }}>
           <h2 style={{ display: 'inline-block', borderBottom: '2px solid #e2e8f0', paddingBottom: '3px', color: '#1e293b', fontSize: '1.4rem', fontWeight: 800, letterSpacing: '2px' }}>MONEY RECEIPT</h2>
         </div>
 
         {/* Receipt Content */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', marginBottom: '60px', fontSize: '1.15rem', color: '#000' }}>
+        <div className="receipt-content" style={{ display: 'flex', flexDirection: 'column', gap: '30px', marginBottom: '60px', fontSize: '1.15rem', color: '#000' }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '15px' }}>
             <span style={{ fontWeight: 700, minWidth: '160px', color: '#000' }}>NAME</span>
             <input 
@@ -213,7 +254,7 @@ const MoneyReceipt = () => {
         </div>
 
         {/* Footer Area */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '40px', marginTop: '60px' }}>
+        <div className="receipt-footer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '40px', marginTop: '60px' }}>
           <div style={{ border: '2px solid #000', padding: '10px 20px', minWidth: '200px', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#000' }}>Rs.</span>
             <input 
@@ -247,9 +288,23 @@ const MoneyReceipt = () => {
           .print-hidden { display: none !important; }
           body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
           .prescription-container { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
-          .prescription-paper { box-shadow: none !important; border: none !important; padding: 20mm !important; margin: 0 !important; min-height: auto !important; height: auto !important; width: 100% !important; }
+          .prescription-paper { box-shadow: none !important; border: none !important; padding: 10mm !important; margin: 0 !important; min-height: auto !important; height: auto !important; width: 100% !important; page-break-inside: avoid !important; break-inside: avoid !important; }
           .receipt-input { border: none !important; padding-left: 0 !important; color: #000 !important; }
           input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+          h1 { font-size: 2.2rem !important; margin: 0 !important; font-weight: 900 !important; color: var(--primary-color) !important; }
+          .prescription-logo { max-height: 150px !important; max-width: 380px !important; }
+          .clinic-details p { line-height: 1.2 !important; margin: 0 !important; font-size: 10.5pt !important; }
+          .clinic-details p.clinic-address-line { font-size: 11.5pt !important; }
+          .clinic-details b, .clinic-details strong { color: #1e293b !important; }
+          .prescription-header {
+            margin: 0 0 0.5rem 0 !important;
+            padding: 0.5rem 0 !important;
+            border-bottom: 2px solid var(--primary-color) !important;
+            height: auto !important;
+          }
+          .receipt-title { margin-bottom: 15px !important; }
+          .receipt-content { gap: 15px !important; margin-bottom: 25px !important; }
+          .receipt-footer { gap: 20px !important; margin-top: 30px !important; }
         }
       `}</style>
     </div>
