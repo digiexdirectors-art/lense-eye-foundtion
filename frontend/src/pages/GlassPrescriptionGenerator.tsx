@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { FileText, Printer, ArrowLeft, Eye, Save } from 'lucide-react';
 
-const emptySpectacle = { sph: '', cyl: '', axis: '', va: '' };
+const emptySpectacle = { sph: '', cyl: '', axis: '', add: '', va: '' };
 
 const GlassPrescriptionGenerator = () => {
   const { id: appointmentId } = useParams();
@@ -339,6 +339,7 @@ const GlassPrescriptionGenerator = () => {
                         <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>Sph</th>
                         <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>Cyl</th>
                         <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>Axis</th>
+                        <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>ADD</th>
                         <th style={{ padding: '0.75rem', border: '1px solid #e2e8f0' }}>V/A</th>
                       </tr>
                     </thead>
@@ -346,7 +347,7 @@ const GlassPrescriptionGenerator = () => {
                       {['rightEye', 'leftEye'].map((eye) => (
                         <tr key={eye}>
                           <td style={{ fontWeight: 700, padding: '0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0' }}>{eye === 'rightEye' ? 'Right' : 'Left'}</td>
-                          {['sph', 'cyl', 'axis', 'va'].map(field => (
+                          {['sph', 'cyl', 'axis', 'add', 'va'].map(field => (
                             <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0' }}>
                               <input 
                                 type="text" 

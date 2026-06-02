@@ -22,6 +22,11 @@ const billCumReceiptSchema = mongoose.Schema({
     required: true,
     unique: true
   },
+  receiptNo: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
   patientIdNo: {
     type: String,
     required: true

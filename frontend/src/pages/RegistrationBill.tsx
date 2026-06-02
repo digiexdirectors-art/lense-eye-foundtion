@@ -14,7 +14,7 @@ const RegistrationBill = () => {
   const [bill, setBill] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [amount, setAmount] = useState(500); // Default registration fee
+  const [amount] = useState(100);
   const [paymentMode] = useState('Cash');
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -26,9 +26,9 @@ const RegistrationBill = () => {
         const { data } = await axios.get(`/api/billing/appointment/${id}`, config);
         setBill(data.data);
       } catch (err) {
-        // No bill found, fetch appointment to create one
-        const { data } = await axios.get(`/api/appointments/${id}`, config);
-        setAppointment(data.data);
+        // No bill found, fetch appointment to show details
+        const { data: apptRes } = await axios.get(`/api/appointments/${id}`, config);
+        setAppointment(apptRes.data);
       }
     } catch (error) {
       console.error("Failed to load bill context", error);
@@ -212,18 +212,10 @@ const RegistrationBill = () => {
             <tbody>
               <tr style={{ backgroundColor: '#f2f8ff' }}>
                 <td style={{ padding: '12px 12px', borderBottom: '1px solid #e2e8f0', fontSize: '0.9rem', color: '#334155' }}>
-                  Patient Registration & Consultation Charges
+                  Patient Registration
                 </td>
                 <td style={{ padding: '12px 12px', borderBottom: '1px solid #e2e8f0', textAlign: 'right', fontWeight: 700, fontSize: '1rem' }}>
-                  {!bill ? (
-                    <input
-                      type="number"
-                      className="form-input print-hidden"
-                      value={amount}
-                      onChange={e => setAmount(Number(e.target.value))}
-                      style={{ textAlign: 'right', width: '90px', padding: '2px 5px' }}
-                    />
-                  ) : bill.amount.toFixed(2)}
+                  {bill ? bill.amount.toFixed(2) : amount.toFixed(2)}
                   <span className="print-only">{bill?.amount.toFixed(2)}</span>
                 </td>
               </tr>

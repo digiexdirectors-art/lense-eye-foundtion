@@ -369,18 +369,20 @@ exports.generatePrescriptionPDF = async (res, prescription) => {
     doc.fillColor("#f1f5f9").rect(50, spectTableTop - 5, 510, 20).fill();
     doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(9);
     doc.text("EYE", 55, spectTableTop);
-    doc.text("SPH", 150, spectTableTop);
-    doc.text("CYL", 250, spectTableTop);
-    doc.text("AXIS", 350, spectTableTop);
-    doc.text("V/A", 450, spectTableTop);
+    doc.text("SPH", 140, spectTableTop);
+    doc.text("CYL", 220, spectTableTop);
+    doc.text("AXIS", 300, spectTableTop);
+    doc.text("ADD", 380, spectTableTop);
+    doc.text("V/A", 460, spectTableTop);
 
     const drawSpectRow = (label, data, y) => {
         doc.fillColor("#1e293b").font("Helvetica-Bold").fontSize(9).text(label, 55, y);
         doc.fillColor("#4b5563").font("Helvetica");
-        doc.text(data?.sph || "-", 150, y);
-        doc.text(data?.cyl || "-", 250, y);
-        doc.text(data?.axis || "-", 350, y);
-        doc.text(data?.va || "-", 450, y);
+        doc.text(data?.sph || "-", 140, y);
+        doc.text(data?.cyl || "-", 220, y);
+        doc.text(data?.axis || "-", 300, y);
+        doc.text(data?.add || "-", 380, y);
+        doc.text(data?.va || "-", 460, y);
     };
     drawSpectRow("Right (O.D.)", prescription.spectaclePrescription?.rightEye, spectTableTop + 25);
     drawSpectRow("Left (O.S.)", prescription.spectaclePrescription?.leftEye, spectTableTop + 45);
@@ -653,7 +655,7 @@ exports.generateRegistrationBillPDF = async (res, bill) => {
     doc.text("AMOUNT (INR)", 450, tableTop + 7, { width: 100, align: "right" });
 
     // Item Row
-    doc.fillColor("#334155").font("Helvetica").fontSize(10).text("Patient Registration & Consultation Charges", 60, tableTop + 40);
+    doc.fillColor("#334155").font("Helvetica").fontSize(10).text("Patient Registration", 60, tableTop + 40);
     doc.font("Helvetica-Bold").text(bill.amount.toFixed(2), 450, tableTop + 40, { width: 100, align: "right" });
 
     // Divider

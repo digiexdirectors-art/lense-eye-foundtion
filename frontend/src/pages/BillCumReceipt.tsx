@@ -81,6 +81,7 @@ const BillCumReceipt = () => {
     doctor: appointment?.doctor,
     createdAt: new Date().toISOString(),
     billNo: 'Pending...',
+    receiptNo: 'Pending...',
     patientIdNo: 'Pending...',
     serviceCode: 'Pending...',
     amount: appointment?.doctor?.consultationFee || 0
@@ -179,6 +180,10 @@ const BillCumReceipt = () => {
             <div style={{ display: 'flex' }}>
               <span style={{ minWidth: '110px', fontWeight: 700, color: '#64748b', fontSize: '0.8rem' }}>Bill No:</span>
               <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.85rem' }}>{displayData.billNo}</span>
+            </div>
+            <div style={{ display: 'flex' }}>
+              <span style={{ minWidth: '110px', fontWeight: 700, color: '#64748b', fontSize: '0.8rem' }}>Receipt No:</span>
+              <span style={{ fontWeight: 800, color: 'var(--primary-color)', fontSize: '0.85rem' }}>{displayData.receiptNo}</span>
             </div>
             <div style={{ display: 'flex' }}>
               <span style={{ minWidth: '110px', fontWeight: 700, color: '#64748b', fontSize: '0.8rem' }}>Patient Name:</span>

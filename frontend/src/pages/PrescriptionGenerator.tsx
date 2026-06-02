@@ -15,7 +15,7 @@ import {
 
 const emptyEye = { pgvn: '', bcvn: '', nct: '', phvn: '' };
 const emptyOptTest = { acd: '', pupillaryReaction: '', eom: '' };
-const emptySpectacle = { sph: '', cyl: '', axis: '', va: '' };
+const emptySpectacle = { sph: '', cyl: '', axis: '', add: '', va: '' };
 const emptyExamination = {
   anteriorSegment: '',
   posteriorSegment: ''
@@ -648,10 +648,11 @@ const PrescriptionGenerator = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <colgroup>
                 <col style={{ width: '15%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '25%' }} />
+                <col style={{ width: '17%' }} />
+                <col style={{ width: '17%' }} />
+                <col style={{ width: '17%' }} />
+                <col style={{ width: '17%' }} />
+                <col style={{ width: '17%' }} />
               </colgroup>
               <thead>
                 <tr style={{ background: '#f8fafc' }}>
@@ -659,6 +660,7 @@ const PrescriptionGenerator = () => {
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>SPH</th>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>CYL</th>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>AXIS</th>
+                  <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>ADD</th>
                   <th style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>V/A</th>
                 </tr>
               </thead>
@@ -668,7 +670,7 @@ const PrescriptionGenerator = () => {
                     <td style={{ padding: '0.5rem', border: '1px solid #e2e8f0', fontWeight: 'bold' }}>
                       {eye === 'rightEye' ? 'Right' : 'Left'}
                     </td>
-                    {['sph', 'cyl', 'axis', 'va'].map((field) => (
+                    {['sph', 'cyl', 'axis', 'add', 'va'].map((field) => (
                       <td key={field} style={{ padding: '0.5rem', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                         <input
                           type="text"

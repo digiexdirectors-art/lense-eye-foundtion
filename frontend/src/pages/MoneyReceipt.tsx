@@ -12,6 +12,8 @@ const MoneyReceipt = () => {
   const { settings } = useSettings();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [billNo, setBillNo] = useState('');
+  const [receiptNo, setReceiptNo] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     age: '',
@@ -48,10 +50,18 @@ const MoneyReceipt = () => {
         const { data: apptData } = await axios.get(`/api/appointments/${id}`, config);
         // setAppointment(apptData.data);
         
+        // Try to fetch Bill Cum Receipt to get billNo
+        try {
+          const { data: billCumRes } = await axios.get(`/api/billing/receipt/appointment/${id}`, config);
+          setBillNo(billCumRes.data?.billNo || 'N/A');
+        } catch (err) {
+          setBillNo('N/A');
+        }
+
         // Check for existing receipt
         try {
           const { data: receiptData } = await axios.get(`/api/billing/money-receipt/appointment/${id}`, config);
-          // setReceipt(receiptData.data);
+          setReceiptNo(receiptData.data.receiptNo || '');
           setFormData({
             name: receiptData.data.name || apptData.data.patient?.name || '',
             age: receiptData.data.age || apptData.data.patient?.age || '',
@@ -86,11 +96,13 @@ const MoneyReceipt = () => {
     setSaving(true);
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('/api/billing/money-receipt', {
+      const { data } = await axios.post('/api/billing/money-receipt', {
         appointmentId: id,
         ...formData
       }, config);
-        // setReceipt(data.data);
+      if (data.data?.receiptNo) {
+        setReceiptNo(data.data.receiptNo);
+      }
       alert("Receipt saved successfully!");
     } catch (error) {
       console.error("Failed to save receipt", error);
@@ -184,12 +196,22 @@ const MoneyReceipt = () => {
         </div>
 
         {/* Bill Title */}
-        <div className="receipt-title" style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <div className="receipt-title" style={{ textAlign: 'center', marginBottom: '40px', position: 'relative' }}>
           <h2 style={{ display: 'inline-block', borderBottom: '2px solid #e2e8f0', paddingBottom: '3px', color: '#1e293b', fontSize: '1.4rem', fontWeight: 800, letterSpacing: '2px' }}>MONEY RECEIPT</h2>
+          {receiptNo && (
+            <div className="blue-text" style={{ position: 'absolute', right: 0, top: '5px', fontSize: '1.05rem', fontWeight: 800, color: 'var(--primary-color)' }}>
+              Receipt No: {receiptNo}
+            </div>
+          )}
         </div>
 
         {/* Receipt Content */}
         <div className="receipt-content" style={{ display: 'flex', flexDirection: 'column', gap: '30px', marginBottom: '60px', fontSize: '1.15rem', color: '#000' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '15px' }}>
+            <span style={{ fontWeight: 700, minWidth: '160px', color: '#000' }}>BILL NO.</span>
+            <span style={{ flex: 1, borderBottom: '1px solid #000', padding: '0 10px', fontSize: '1.15rem', color: '#000', fontWeight: 700 }}>{billNo || 'N/A'}</span>
+          </div>
+
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '15px' }}>
             <span style={{ fontWeight: 700, minWidth: '160px', color: '#000' }}>NAME</span>
             <input 

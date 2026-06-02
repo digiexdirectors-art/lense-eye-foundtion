@@ -10,15 +10,17 @@ const createPatient = async (req, res) => {
         // Auto-generate mrdNumber if not provided
         let mrdNumber = req.body.mrdNumber;
         if (!mrdNumber) {
+            const currentYear = new Date().getFullYear();
             const lastPatient = await Patient.findOne({ mrdNumber: { $exists: true, $ne: null } }).sort({ createdAt: -1 });
-            mrdNumber = '000001';
+            let lastMrdNum = 0;
             if (lastPatient && lastPatient.mrdNumber) {
-                const lastMrdStr = String(lastPatient.mrdNumber);
-                const lastMrdNum = parseInt(lastMrdStr.replace(/\D/g, ''), 10);
-                if (!isNaN(lastMrdNum)) {
-                    mrdNumber = String(lastMrdNum + 1).padStart(6, '0');
+                const parts = String(lastPatient.mrdNumber).split('/');
+                const lastMrdNumParsed = parseInt(parts[0].replace(/\D/g, ''), 10);
+                if (!isNaN(lastMrdNumParsed)) {
+                    lastMrdNum = lastMrdNumParsed;
                 }
             }
+            mrdNumber = `${String(lastMrdNum + 1).padStart(6, '0')}/${currentYear}`;
         }
 
         const patient = await Patient.create({

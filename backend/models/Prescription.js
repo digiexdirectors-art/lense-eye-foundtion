@@ -17,6 +17,7 @@ const spectacleSchema = mongoose.Schema({
   sph: { type: String, default: '' },
   cyl: { type: String, default: '' },
   axis: { type: String, default: '' },
+  add: { type: String, default: '' },
   va: { type: String, default: '' }
 }, { _id: false });
 

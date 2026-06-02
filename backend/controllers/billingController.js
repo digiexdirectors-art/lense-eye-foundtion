@@ -18,23 +18,40 @@ const getFinancialYear = () => {
 
 exports.createRegistrationBill = async (req, res) => {
     try {
-        const { appointmentId, amount, paymentMode } = req.body;
+        const { appointmentId, paymentMode } = req.body;
+        const amount = 100.00; // Fixed registration fee
         
         const appointment = await Appointment.findById(appointmentId).populate('patient').populate('doctor');
         if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
 
-        let bill = await RegistrationBill.findOne({ appointment: appointmentId });
+        let bill = await RegistrationBill.findOne({ appointment: appointmentId })
+            .populate('patient', 'name phone address mrdNumber')
+            .populate('doctor', 'name specialization qualifications');
         if (bill) return res.json({ success: true, data: bill });
 
-        // Get and increment sequence
-        let sequence = await Sequence.findOneAndUpdate(
-            { id: 'registration_bill' },
-            { $inc: { sequence_value: 1 } },
-            { new: true, upsert: true, setDefaultsOnInsert: true }
-        );
+        // Get and increment year-scoped sequence
+        const currentYear = new Date().getFullYear();
+        let sequence = await Sequence.findOne({ id: `registration_bill_${currentYear}` });
+        if (!sequence) {
+            try {
+                sequence = await Sequence.create({ id: `registration_bill_${currentYear}`, sequence_value: 1 });
+            } catch (err) {
+                // In case of parallel request race condition
+                sequence = await Sequence.findOneAndUpdate(
+                    { id: `registration_bill_${currentYear}` },
+                    { $inc: { sequence_value: 1 } },
+                    { new: true }
+                );
+            }
+        } else {
+            sequence = await Sequence.findOneAndUpdate(
+                { id: `registration_bill_${currentYear}` },
+                { $inc: { sequence_value: 1 } },
+                { new: true }
+            );
+        }
 
-        const fy = getFinancialYear();
-        const receiptNo = `${sequence.sequence_value} / ${fy}`;
+        const receiptNo = `${sequence.sequence_value}/${currentYear}`;
 
         bill = await RegistrationBill.create({
             appointment: appointmentId,
@@ -45,7 +62,11 @@ exports.createRegistrationBill = async (req, res) => {
             paymentMode
         });
 
-        res.json({ success: true, data: bill });
+        const populatedBill = await RegistrationBill.findById(bill._id)
+            .populate('patient', 'name phone address mrdNumber')
+            .populate('doctor', 'name specialization qualifications');
+
+        res.json({ success: true, data: populatedBill });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -73,33 +94,57 @@ exports.createBillCumReceipt = async (req, res) => {
             .populate('doctor');
         if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
 
-        let receipt = await BillCumReceipt.findOne({ appointment: appointmentId });
+        let receipt = await BillCumReceipt.findOne({ appointment: appointmentId })
+            .populate('patient')
+            .populate('doctor');
         if (receipt) return res.json({ success: true, data: receipt });
 
-        // Sequences for Bill No, Patient ID, and Service Code
-        // Bill No sequence
-        let billSeq = await Sequence.findOneAndUpdate(
-            { id: 'bill_cum_receipt_no' },
-            { $inc: { sequence_value: 1 } },
-            { new: true, upsert: true, setDefaultsOnInsert: true }
-        );
-        if (billSeq.sequence_value < 1000) {
-            billSeq.sequence_value = 1000;
-            await billSeq.save();
-        }
+        const currentYear = new Date().getFullYear();
+        const currentYearShort = String(currentYear).slice(-2);
 
-        // Patient ID sequence
-        let patientIdSeq = await Sequence.findOneAndUpdate(
-            { id: 'bill_patient_id' },
-            { $inc: { sequence_value: 1 } },
-            { new: true, upsert: true, setDefaultsOnInsert: true }
-        );
-        if (patientIdSeq.sequence_value < 1000) {
-            patientIdSeq.sequence_value = 1000;
-            await patientIdSeq.save();
+        // 1. Patient ID Sequence resetting yearly
+        let patSeq = await Sequence.findOne({ id: `bill_patient_id_${currentYear}` });
+        if (!patSeq) {
+            try {
+                patSeq = await Sequence.create({ id: `bill_patient_id_${currentYear}`, sequence_value: 1 });
+            } catch (err) {
+                patSeq = await Sequence.findOneAndUpdate(
+                    { id: `bill_patient_id_${currentYear}` },
+                    { $inc: { sequence_value: 1 } },
+                    { new: true }
+                );
+            }
+        } else {
+            patSeq = await Sequence.findOneAndUpdate(
+                { id: `bill_patient_id_${currentYear}` },
+                { $inc: { sequence_value: 1 } },
+                { new: true }
+            );
         }
+        const patientIdNo = `${String(patSeq.sequence_value).padStart(3, '0')}/${currentYear}`;
 
-        // Service Code sequence
+        // 2. Receipt No Sequence resetting yearly
+        let recSeq = await Sequence.findOne({ id: `bill_cum_receipt_rec_${currentYear}` });
+        if (!recSeq) {
+            try {
+                recSeq = await Sequence.create({ id: `bill_cum_receipt_rec_${currentYear}`, sequence_value: 1 });
+            } catch (err) {
+                recSeq = await Sequence.findOneAndUpdate(
+                    { id: `bill_cum_receipt_rec_${currentYear}` },
+                    { $inc: { sequence_value: 1 } },
+                    { new: true }
+                );
+            }
+        } else {
+            recSeq = await Sequence.findOneAndUpdate(
+                { id: `bill_cum_receipt_rec_${currentYear}` },
+                { $inc: { sequence_value: 1 } },
+                { new: true }
+            );
+        }
+        const receiptNo = `${String(recSeq.sequence_value).padStart(3, '0')}/${currentYearShort}`;
+
+        // 3. Service Code sequence
         let serviceSeq = await Sequence.findOneAndUpdate(
             { id: 'bill_service_code' },
             { $inc: { sequence_value: 1 } },
@@ -110,10 +155,8 @@ exports.createBillCumReceipt = async (req, res) => {
             await serviceSeq.save();
         }
 
-        const fy = getFinancialYear();
-        const billNo = `LEF\\${fy}\\OPD\\${billSeq.sequence_value}`;
-        const patientIdNo = `${patientIdSeq.sequence_value}`;
-        const serviceCode = `TLEF-${serviceSeq.sequence_value}`;
+        const billNo = `LEF/${patientIdNo}`;
+        const serviceCode = `LEF-${patientIdNo}`;
         
         // Use doctor consultation fee if available, else default to 0
         const amount = appointment.doctor.consultationFee || 0;
@@ -123,6 +166,7 @@ exports.createBillCumReceipt = async (req, res) => {
             patient: appointment.patient._id,
             doctor: appointment.doctor._id,
             billNo,
+            receiptNo,
             patientIdNo,
             serviceCode,
             amount
@@ -232,6 +276,7 @@ exports.getBills = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
 exports.createMoneyReceipt = async (req, res) => {
     try {
         const { appointmentId, name, age, sex, receivedFrom, sumOfRupees, purpose, amount } = req.body;
