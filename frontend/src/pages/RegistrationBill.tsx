@@ -215,8 +215,7 @@ const RegistrationBill = () => {
                   Patient Registration
                 </td>
                 <td style={{ padding: '12px 12px', borderBottom: '1px solid #e2e8f0', textAlign: 'right', fontWeight: 700, fontSize: '1rem' }}>
-                  {bill ? bill.amount.toFixed(2) : amount.toFixed(2)}
-                  <span className="print-only">{bill?.amount.toFixed(2)}</span>
+                  INR {bill ? bill.amount.toFixed(2) : amount.toFixed(2)}
                 </td>
               </tr>
             </tbody>
