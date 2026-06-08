@@ -449,7 +449,21 @@ exports.generatePrescriptionPDF = async (res, prescription) => {
     doc.text(`Suggested Lens: ${prescription.suggestedLens || "N/A"}`, 60, currentY); currentY += 12;
     if (prescription.comments) { doc.text(`Comments: ${prescription.comments}`, 60, currentY); currentY += 12; }
     if (prescription.nextReviewDate) { 
-        doc.text(`Next Review: ${new Date(prescription.nextReviewDate).toLocaleDateString()} - ${prescription.nextReviewNote || ''}`, 60, currentY); 
+        let reviewDateStr = prescription.nextReviewDate;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(prescription.nextReviewDate)) {
+            const [year, month, day] = prescription.nextReviewDate.split('-').map(Number);
+            const parsedDate = new Date(year, month - 1, day);
+            if (!isNaN(parsedDate.getTime())) {
+                reviewDateStr = parsedDate.toLocaleDateString('en-IN');
+            }
+        } else {
+            const parsedDate = new Date(prescription.nextReviewDate);
+            if (!isNaN(parsedDate.getTime()) && prescription.nextReviewDate.includes('T')) {
+                reviewDateStr = parsedDate.toLocaleDateString('en-IN');
+            }
+        }
+        const notePart = prescription.nextReviewNote ? ` - ${prescription.nextReviewNote}` : '';
+        doc.text(`Next Review: ${reviewDateStr}${notePart}`, 60, currentY); 
         currentY += 12; 
     }
 

@@ -155,16 +155,16 @@ const BillCumReceipt = () => {
             </div>
           </div>
 
-          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.92rem', color: '#1e293b', lineHeight: '1.2', fontWeight: 'bold' }}>
-            <p style={{ margin: 0, fontWeight: 800, color: 'var(--primary-color)' }}>For Appointment:</p>
-            <p style={{ margin: '0 0 2px 0', fontWeight: 800 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
+          <div className="clinic-details" style={{ textAlign: 'right', fontSize: '0.92rem', color: '#1e293b', lineHeight: '1.2', fontWeight: 500 }}>
+            <p style={{ margin: 0, fontWeight: 500, color: 'var(--primary-color)' }}>For Appointment:</p>
+            <p style={{ margin: '0 0 2px 0', fontWeight: 500 }}>{settings.appointmentHours || 'Mon-Sat: 9:00AM - 6:00 PM'}</p>
             {settings.address && settings.address.split('\n').map((line: string, i: number) => (
-              <p key={i} className="clinic-address-line" style={{ margin: 0, fontWeight: 800, textTransform: 'uppercase', color: '#1e293b', fontSize: '0.95rem' }}>{line}</p>
+              <p key={i} className="clinic-address-line" style={{ margin: 0, fontWeight: 500, textTransform: 'uppercase', color: '#1e293b', fontSize: '0.95rem' }}>{line}</p>
             ))}
-            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Tel: {settings.phone}</p>
-            <p style={{ margin: 0, fontWeight: 800 }}>Email: {settings.email}</p>
-            {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>GSTIN: {settings.gstin}</p>}
-            <p style={{ margin: '2px 0 0 0', fontWeight: 800 }}>Mob: {settings.mobile || '+91 9733035399'}</p>
+            <p style={{ margin: '2px 0 0 0', fontWeight: 500 }}>Tel: {settings.phone}</p>
+            <p style={{ margin: 0, fontWeight: 500 }}>Email: {settings.email}</p>
+            {settings.gstin && <p style={{ margin: '2px 0 0 0', fontWeight: 500 }}>GSTIN: {settings.gstin}</p>}
+            <p style={{ margin: '2px 0 0 0', fontWeight: 500 }}>Mob: {settings.mobile || '+91 9733035399'}</p>
           </div>
         </div>
 
